@@ -90,17 +90,19 @@ const LIVE_MANUAL = {
   ca5yCmb: { value: '3.29%', change: '-5 bps', dir: 'down', date: 'May 26' },
 };
 
-// If scrape_live_data.js ran first, merge its output (overrides Playwright-only fields above)
-// Only merge non-null values so LIVE_MANUAL fallbacks survive scrape failures
-try {
-  const scraped = JSON.parse(require('fs').readFileSync(
-    path.join(__dirname, 'live_manual_data.json'), 'utf8'));
-  let merged = 0;
-  for (const [k, v] of Object.entries(scraped)) {
-    if (v !== null && v !== undefined) { LIVE_MANUAL[k] = v; merged++; }
-  }
-  console.log(`Loaded live_manual_data.json (${merged}/5 scraped indicators)`);
-} catch { /* file absent — use LIVE_MANUAL defaults */ }
+// Load persistent cache — all indicators from last successful local run.
+// Provides: (a) fresh Playwright values written by scrape_live_data.js,
+//           (b) API-indicator fallbacks when network is blocked (e.g. CCR routine environment).
+const _cache = (() => {
+  try { return JSON.parse(require('fs').readFileSync(path.join(__dirname, 'live_manual_data.json'), 'utf8')) || {}; }
+  catch { return {}; }
+})();
+// Apply cached Playwright-indicator values into LIVE_MANUAL (non-null only; scraper's fresh values win)
+for (const k of ['cnnFG', 'mm', 'aaii', 'ca5yCmb', 'fundFlow', 'naaim']) {
+  if (_cache[k] != null) LIVE_MANUAL[k] = _cache[k];
+}
+if (Object.keys(_cache).length) console.log('Loaded live_manual_data.json (cache)');
+
 
 // ════════════════════════════════════════════════════════════════
 //  API FETCH  (runs automatically — no editing needed)
@@ -418,8 +420,11 @@ async function main() {
   console.log(`Fetching 10 API indicators (${TODAY})…`);
   const apiData = await fetchAPIData();
 
-  // Merge: API data fills in the 10 auto-fetched keys; LIVE_MANUAL provides the 6 manual keys
-  const LIVE = { ...LIVE_MANUAL, ...apiData };
+  // Merge: cache provides API-indicator fallbacks; non-null API results win; LIVE_MANUAL wins for Playwright indicators
+  const LIVE = { ..._cache, ...LIVE_MANUAL };
+  for (const [k, v] of Object.entries(apiData)) {
+    if (v !== null && v !== undefined) LIVE[k] = v;
+  }
 
   // Summary log
   const apiKeys = ['cryptoFG','btcDom','ethBtc','sofr','vix','us10y','us30y','usdCad','usdCny','cadCny'];
@@ -466,7 +471,7 @@ async function main() {
       br: { label: 'S&P 500 前值',      value: LIVE.mm.sp500Prev    },
       note: 'as of ' + LIVE.mm.date,
     }),
-    3: (sl, pr, x, y, w, h) => addSofrCard(sl, pr, x, y, w, h, LIVE.sofr),
+    3: (sl, pr, x, y, w, h) => { if (LIVE.sofr) addSofrCard(sl, pr, x, y, w, h, LIVE.sofr); },
     4: (sl, pr, x, y, w, h) => addQuadCard(sl, pr, x, y, w, h, {
       title: 'AAII 情绪调查',
       tl: { label: '看多 当前', value: LIVE.aaii.bullCurrent },
@@ -496,6 +501,12 @@ async function main() {
   const outFile = 'investment-index-slides_' + TODAY.replace(/-/g, '_') + '.pptx';
   await pres.writeFile({ fileName: outFile });
   console.log('SUCCESS: ' + outFile);
+
+  // Persist all 16 indicator values so CCR routine can use them as fallbacks on next run
+  try {
+    require('fs').writeFileSync(path.join(__dirname, 'live_manual_data.json'), JSON.stringify(LIVE, null, 2));
+    console.log('Saved live_manual_data.json (full cache updated)');
+  } catch {}
 
   // ── Cleanup .playwright-mcp temp files
   const fs = require('fs');
