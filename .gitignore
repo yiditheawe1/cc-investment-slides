@@ -1,6 +1,7 @@
 # Generated outputs
 *.pptx
 coinank_snapshot.md
+canadaici_snapshot.md
 
 # Node dependencies (install via npm install)
 node_modules/

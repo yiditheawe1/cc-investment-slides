@@ -52,22 +52,22 @@ const LIVE_MANUAL = {
   // ── CRYPTO
   fundFlow: {
     items: [
-      { label: '15m',      value: '-2,063.62万',  dir: 'down'    },
-      { label: '4h',       value: '-2.20亿',       dir: 'down'    },
-      { label: '7D',       value: '+5.11亿',       dir: 'up'      },
-      { label: '30D',      value: '+53.14亿',      dir: 'up'      },
-      { label: '市值($)',  value: '15,212.43亿',   dir: 'neutral' },
-      { label: '资金信号', value: '-14 净流出',    dir: 'down'    },
+      { label: '15m',      value: '-1,080.26万',  dir: 'down'    },
+      { label: '4h',       value: '-1.74亿',       dir: 'down'    },
+      { label: '7D',       value: '4.41亿',        dir: 'up'      },
+      { label: '30D',      value: '50.92亿',       dir: 'up'      },
+      { label: '市值($)',  value: '15,159.49亿',   dir: 'neutral' },
+      { label: '资金信号', value: '-5 流向均衡',   dir: 'down'    },
     ],
-    date: 'May 26',
+    date: 'May 27',
   },
 
   // ── STOCK
-  cnnFG:  { value: '60.14', change: 'prev 58.97 • Greed', dir: 'up', date: 'May 26' },
+  cnnFG:  { value: '60.74', change: 'prev 60.74 • Greed', dir: 'neutral', date: 'May 27' },
   mm: {
     mmCurrent:    '68.22',
     mmPrev:       '61.69',
-    sp500Current: '7,510.60',
+    sp500Current: '7,519.12',
     sp500Prev:    '7,473.47',
     date:         'Apr 2026',
   },
@@ -89,20 +89,6 @@ const LIVE_MANUAL = {
   // ── RATES
   ca5yCmb: { value: '3.29%', change: '-5 bps', dir: 'down', date: 'May 26' },
 };
-
-// Load persistent cache — all indicators from last successful local run.
-// Provides: (a) fresh Playwright values written by scrape_live_data.js,
-//           (b) API-indicator fallbacks when network is blocked (e.g. CCR routine environment).
-const _cache = (() => {
-  try { return JSON.parse(require('fs').readFileSync(path.join(__dirname, 'live_manual_data.json'), 'utf8')) || {}; }
-  catch { return {}; }
-})();
-// Apply cached Playwright-indicator values into LIVE_MANUAL (non-null only; scraper's fresh values win)
-for (const k of ['cnnFG', 'mm', 'aaii', 'ca5yCmb', 'fundFlow', 'naaim']) {
-  if (_cache[k] != null) LIVE_MANUAL[k] = _cache[k];
-}
-if (Object.keys(_cache).length) console.log('Loaded live_manual_data.json (cache)');
-
 
 // ════════════════════════════════════════════════════════════════
 //  API FETCH  (runs automatically — no editing needed)
@@ -420,11 +406,8 @@ async function main() {
   console.log(`Fetching 10 API indicators (${TODAY})…`);
   const apiData = await fetchAPIData();
 
-  // Merge: cache provides API-indicator fallbacks; non-null API results win; LIVE_MANUAL wins for Playwright indicators
-  const LIVE = { ..._cache, ...LIVE_MANUAL };
-  for (const [k, v] of Object.entries(apiData)) {
-    if (v !== null && v !== undefined) LIVE[k] = v;
-  }
+  // Merge: API data fills in the 10 auto-fetched keys; LIVE_MANUAL provides the 6 manual keys
+  const LIVE = { ...LIVE_MANUAL, ...apiData };
 
   // Summary log
   const apiKeys = ['cryptoFG','btcDom','ethBtc','sofr','vix','us10y','us30y','usdCad','usdCny','cadCny'];
@@ -471,7 +454,7 @@ async function main() {
       br: { label: 'S&P 500 前值',      value: LIVE.mm.sp500Prev    },
       note: 'as of ' + LIVE.mm.date,
     }),
-    3: (sl, pr, x, y, w, h) => { if (LIVE.sofr) addSofrCard(sl, pr, x, y, w, h, LIVE.sofr); },
+    3: (sl, pr, x, y, w, h) => addSofrCard(sl, pr, x, y, w, h, LIVE.sofr),
     4: (sl, pr, x, y, w, h) => addQuadCard(sl, pr, x, y, w, h, {
       title: 'AAII 情绪调查',
       tl: { label: '看多 当前', value: LIVE.aaii.bullCurrent },
@@ -501,12 +484,6 @@ async function main() {
   const outFile = 'investment-index-slides_' + TODAY.replace(/-/g, '_') + '.pptx';
   await pres.writeFile({ fileName: outFile });
   console.log('SUCCESS: ' + outFile);
-
-  // Persist all 16 indicator values so CCR routine can use them as fallbacks on next run
-  try {
-    require('fs').writeFileSync(path.join(__dirname, 'live_manual_data.json'), JSON.stringify(LIVE, null, 2));
-    console.log('Saved live_manual_data.json (full cache updated)');
-  } catch {}
 
   // ── Cleanup .playwright-mcp temp files
   const fs = require('fs');
