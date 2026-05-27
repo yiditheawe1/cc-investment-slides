@@ -1,0 +1,16 @@
+# Generated outputs
+*.pptx
+coinank_snapshot.md
+
+# Node dependencies (install via npm install)
+node_modules/
+
+# Local machine config
+.claude/settings.local.json
+.claude/agent-memory/
+
+# Old skill version
+.claude/skills/investment-index-slides_old/
+
+# Playwright MCP logs
+.playwright-mcp/
