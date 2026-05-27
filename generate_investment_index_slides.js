@@ -90,6 +90,14 @@ const LIVE_MANUAL = {
   ca5yCmb: { value: '3.29%', change: '-5 bps', dir: 'down', date: 'May 26' },
 };
 
+// If scrape_live_data.js ran first, merge its output (overrides Playwright-only fields above)
+try {
+  const scraped = JSON.parse(require('fs').readFileSync(
+    path.join(__dirname, 'live_manual_data.json'), 'utf8'));
+  Object.assign(LIVE_MANUAL, scraped);
+  console.log('Loaded live_manual_data.json (5 scraped indicators)');
+} catch { /* file absent — use LIVE_MANUAL defaults */ }
+
 // ════════════════════════════════════════════════════════════════
 //  API FETCH  (runs automatically — no editing needed)
 //
