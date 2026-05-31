@@ -53,22 +53,22 @@ const LIVE_MANUAL = {
   // ── CRYPTO
   fundFlow: {
     items: [
-      { label: '15m',      value: '2.80亿',       dir: 'up'      },
-      { label: '4h',       value: '2.60亿',       dir: 'up'      },
-      { label: '7D',       value: '2,746.09万',   dir: 'up'      },
-      { label: '30D',      value: '59.64亿',      dir: 'up'      },
-      { label: '市值($)',  value: '14,579.43亿',  dir: 'neutral' },
-      { label: '资金信号', value: '+38净流入',     dir: 'up'      },
+      { label: '15m',      value: '-1,104.27万',  dir: 'down'    },
+      { label: '4h',       value: '-1.14亿',      dir: 'down'    },
+      { label: '7D',       value: '4,650.61万',   dir: 'up'      },
+      { label: '30D',      value: '57.91亿',      dir: 'up'      },
+      { label: '市值($)',  value: '14,834.95亿',  dir: 'neutral' },
+      { label: '资金信号', value: '+35净流入',     dir: 'up'      },
     ],
-    date: 'May 29',
+    date: 'May 31',
   },
 
   // ── STOCK
-  cnnFG:  { value: '59.83', change: 'prev 60.09 • Greed', dir: 'down', date: 'May 29' },
+  cnnFG:  { value: '60.17', change: 'prev 60.09 • Greed', dir: 'up', date: 'May 29' },
   mm: {
     mmCurrent:    '68.22',
     mmPrev:       '61.69',
-    sp500Current: '7,581.00',
+    sp500Current: '7,580.06',
     sp500Prev:    '7,563.63',
     date:         'Apr 2026',
   },
@@ -88,8 +88,8 @@ const LIVE_MANUAL = {
   },
 
   // ── RATES  (canadaici.com — querySelectorAll('div.widgetTableCell.field3.col3 a'))
-  ca5yGoc: { value: '3.23%', change: '+4 bps', dir: 'up', date: 'May 29' }, // index [0] GOC 5Y
-  ca5yCmb: { value: '3.37%', change: '+5 bps', dir: 'up', date: 'May 29' }, // index [2] CMB 5Y
+  ca5yGoc: { value: '3.23%', change: '+4 bps', dir: 'up', date: 'May 31' }, // index [0] GOC 5Y
+  ca5yCmb: { value: '3.37%', change: '+5 bps', dir: 'up', date: 'May 31' }, // index [2] CMB 5Y
 };
 
 // ════════════════════════════════════════════════════════════════

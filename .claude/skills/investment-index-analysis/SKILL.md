@@ -71,6 +71,8 @@ Only use articles dated **today or yesterday** (relative to `market-index.json` 
 | Alternative.me | https://alternative.me/crypto/fear-and-greed-index/ |
 | CryptoQuant | https://cryptoquant.com/ |
 | CoinMarketCap | https://coinmarketcap.com/headlines/ |
+| Investing.com Crypto News | https://www.investing.com/news/cryptocurrency-news |
+| Investing.com Crypto Analysis | https://www.investing.com/analysis/cryptocurrency |
 
 Relate news to: F&G direction, BTC dominance shift, ETH/BTC trend, fund flow sign change.
 
@@ -78,12 +80,12 @@ Relate news to: F&G direction, BTC dominance shift, ETH/BTC trend, fund flow sig
 
 | Source | URL |
 |--------|-----|
-| CNN Markets | https://edition.cnn.com/markets |
+| CNN Markets | https://www.cnn.com/business/investing |
 | CNBC Markets | https://www.cnbc.com/markets/ |
-| Bloomberg Markets | https://www.bloomberg.com/markets |
-| AAII Survey | https://www.aaii.com/sentimentsurvey |
 | NAAIM Index | https://naaim.org/programs/naaim-exposure-index/ |
 | MacroMicro | https://en.macromicro.me/ |
+| Investing.com Stock News | https://www.investing.com/news/stock-market-news |
+| Investing.com Stock Analysis | https://www.investing.com/analysis/stock-markets |
 
 Relate news to: CNN F&G score, VIX level, MM Bull/Bear move, AAII bull/bear shift, NAAIM manager positioning.
 
@@ -94,7 +96,7 @@ Relate news to: CNN F&G score, VIX level, MM Bull/Bear move, AAII bull/bear shif
 | NY Fed SOFR | https://www.newyorkfed.org/markets/reference-rates/sofr |
 | US Treasury | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/ |
 | Bank of Canada | https://www.bankofcanada.ca/rates/ |
-| Bloomberg Rates | https://www.bloomberg.com/markets/rates-bonds |
+| Investing.com Bond Analysis | https://www.investing.com/analysis/bonds |
 
 Relate news to: SOFR rate vs percentiles, US 10Y/30Y direction, Canada 5Y CMB move.
 
@@ -102,11 +104,19 @@ Relate news to: SOFR rate vs percentiles, US 10Y/30Y direction, Canada 5Y CMB mo
 
 | Source | URL |
 |--------|-----|
-| Bloomberg FX | https://www.bloomberg.com/markets/currencies |
-| Reuters FX | https://www.reuters.com/markets/currencies/ |
-| MarketWatch FX | https://www.marketwatch.com/market-data/currencies |
+| Investing.com Forex News | https://www.investing.com/news/forex-news |
+| Investing.com Forex Analysis | https://www.investing.com/analysis/forex |
 
 Relate news to: USD/CAD, USD/CNY, CAD/CNY direction and magnitude.
+
+#### 市场总览 / Breaking News sources (use to supplement any category)
+
+| Source | URL |
+|--------|-----|
+| Investing.com Market Overview | https://www.investing.com/analysis/market-overview |
+| Investing.com Breaking News | https://www.investing.com/news/headlines |
+
+Use these when cross-category context is needed (e.g. macro events driving simultaneous equity + forex + rates moves). Extract headlines dated today or yesterday and assign each to the most relevant category in the analysis.
 
 ---
 
@@ -224,13 +234,23 @@ node generate_investment_index_analysis.js
 - Report any indicators where news was not found (mark N/A in analysis)
 - Do NOT open or preview the file — report path only
 
+### Step 5 — Close browser
+
+After QA is confirmed, close any Playwright browser pages opened during this skill run:
+
+```
+browser_close()
+```
+
+This releases the browser process. If `browser_close` fails or is unavailable, skip silently — do not retry or report as an error.
+
 ---
 
 ## Known Pitfalls
 
 | Pitfall | Fix |
 |---------|-----|
-| Bloomberg / CNBC returns 403 | Use Playwright MCP; fall back to CNN or Reuters |
+| CNBC returns 403 | Use Playwright MCP; if unavailable, Investing.com stock/overview covers the same news |
 | CoinGlass JS-rendered | Use Playwright MCP: navigate → wait 4s → snapshot |
 | News too old (>2 days) | Skip and note "no recent news found" in analysis |
 | `market-index.json` missing | Run investment-index-slides skill first to generate it |

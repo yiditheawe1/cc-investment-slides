@@ -1,50 +1,50 @@
 {
-  "date": "2026-05-29",
+  "date": "2026-05-31",
   "fundFlow": {
     "items": [
       {
         "label": "15m",
-        "value": "2.80亿",
-        "dir": "up"
+        "value": "-1,104.27万",
+        "dir": "down"
       },
       {
         "label": "4h",
-        "value": "2.60亿",
-        "dir": "up"
+        "value": "-1.14亿",
+        "dir": "down"
       },
       {
         "label": "7D",
-        "value": "2,746.09万",
+        "value": "4,650.61万",
         "dir": "up"
       },
       {
         "label": "30D",
-        "value": "59.64亿",
+        "value": "57.91亿",
         "dir": "up"
       },
       {
         "label": "市值($)",
-        "value": "14,579.43亿",
+        "value": "14,834.95亿",
         "dir": "neutral"
       },
       {
         "label": "资金信号",
-        "value": "+38净流入",
+        "value": "+35净流入",
         "dir": "up"
       }
     ],
-    "date": "May 29"
+    "date": "May 31"
   },
   "cnnFG": {
-    "value": "59.83",
+    "value": "60.17",
     "change": "prev 60.09 • Greed",
-    "dir": "down",
+    "dir": "up",
     "date": "May 29"
   },
   "mm": {
     "mmCurrent": "68.22",
     "mmPrev": "61.69",
-    "sp500Current": "7,581.00",
+    "sp500Current": "7,580.06",
     "sp500Prev": "7,563.63",
     "date": "Apr 2026"
   },
@@ -66,31 +66,31 @@
     "value": "3.23%",
     "change": "+4 bps",
     "dir": "up",
-    "date": "May 29"
+    "date": "May 31"
   },
   "ca5yCmb": {
     "value": "3.37%",
     "change": "+5 bps",
     "dir": "up",
-    "date": "May 29"
+    "date": "May 31"
   },
   "cryptoFG": {
-    "value": "23",
-    "change": "prev 22 • Extreme Fear",
+    "value": "28",
+    "change": "prev 23 • Extreme Fear",
     "dir": "up",
-    "date": "May 28"
+    "date": "May 30"
   },
   "btcDom": {
-    "value": "57.6%",
+    "value": "57.3%",
     "change": "—",
     "dir": "neutral",
-    "date": "May 29"
+    "date": "May 31"
   },
   "ethBtc": {
-    "value": "0.02757",
-    "change": "+0.99%",
-    "dir": "up",
-    "date": "May 29"
+    "value": "0.02723",
+    "change": "-0.66%",
+    "dir": "down",
+    "date": "May 31"
   },
   "sofr": {
     "date": "05/28",
@@ -122,39 +122,39 @@
     ]
   },
   "vix": {
-    "value": "15.53",
-    "change": "-1.06 (-6.39%)",
+    "value": "15.32",
+    "change": "-1.27 (-7.66%)",
     "dir": "down",
-    "date": "May 29"
+    "date": "May 31"
   },
   "us10y": {
-    "value": "4.434%",
-    "change": "-0.059%",
+    "value": "4.453%",
+    "change": "-0.040%",
     "dir": "down",
-    "date": "May 29"
+    "date": "May 31"
   },
   "us30y": {
-    "value": "4.974%",
-    "change": "-0.052%",
+    "value": "4.993%",
+    "change": "-0.033%",
     "dir": "down",
-    "date": "May 29"
+    "date": "May 31"
   },
   "usdCad": {
-    "value": "1.3779",
+    "value": "1.3795",
     "change": "prev 1.3802",
     "dir": "down",
-    "date": "May 29"
+    "date": "May 31"
   },
   "usdCny": {
     "value": "6.7657",
     "change": "prev 6.7945",
     "dir": "down",
-    "date": "May 29"
+    "date": "May 31"
   },
   "cadCny": {
-    "value": "4.9102",
+    "value": "4.9041",
     "change": "prev 4.9219",
     "dir": "down",
-    "date": "May 29"
+    "date": "May 31"
   }
 }

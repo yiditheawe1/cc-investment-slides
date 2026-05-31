@@ -18,123 +18,119 @@ const DATE_DISPLAY = new Date(DATE + 'T12:00:00Z')
   .toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
 
 // ════════════════════════════════════════════════════════════
-//  ANALYSIS  — synthesized from live news (May 29 2026)
+//  ANALYSIS  — synthesized from live news (May 31 2026)
 //  Sources: CoinDesk · Alternative.me · CoinMarketCap ·
-//           CNBC Markets · NAAIM · Canada ICI
+//           Investing.com (Crypto/Stock/Forex/Bonds/Overview)
 // ════════════════════════════════════════════════════════════
 const ANALYSIS = {
   crypto: {
     trend:
-      '加密恐惧贪婪指数 23（极度恐惧），较前日 22 微升但仍处极恐区间；较一周前 28 下滑明显。' +
-      'BTC 主导率 57.6% 横盘，ETH/BTC 小幅回升至 0.02757（+0.99%），ETH 阶段性跑赢 BTC。' +
-      '资金信号全面转正：15m +2.80亿、4h +2.60亿、7D +2,746万、30D +59.64亿，资金信号 +38 净流入，' +
-      '为近日首次短中长期资金流向全线翻绿。',
+      '加密恐惧贪婪指数从 23（极度恐惧）回升至 28（恐惧），情绪阶段性改善但仍处低迷区间。' +
+      'BTC 主导率 57.2%，ETH/BTC 维持 0.02743（+0.15%）。' +
+      '资金流分化：短期（15m -1,104万、4h -1.14亿）净流出，中长期（7D +4,651万、30D +57.91亿）仍正；' +
+      '资金信号 +35 净流入，结构多头但短期承压。',
     cause:
-      '比特币 ETF 遭遇历史最长 9 日连续净流出，累计撤资约 28 亿美元，机构情绪持续低迷（CoinDesk）。' +
-      'BTC 价格未能突破 83,000 美元，在标普 500、纳斯达克双双创历史新高时出现罕见背离（CoinDesk）。' +
-      'CryptoQuant 报告长期持有者仓位创历史新高，但"新买家严重不足"，预测市场看空（CoinDesk）。' +
-      'CFTC 批准 Kalshi、Coinbase 首批加密永续期货合约，监管利好提振短期情绪（CoinMarketCap）。' +
-      '今日资金流向全面转正或为技术性反弹买盘，需观察能否持续。',
+      'BTC 与 ETH ETF 过去两周合计净流出约 20 亿美元，分析师警告跌势或将延续（Investing.com / CoinDesk）。' +
+      'CME 集团 5 月 31 日正式推出全天候 24/7 加密货币期货交易，标志机构基础设施重要里程碑（Investing.com）。' +
+      '美国"经济愤怒行动"没收约 10 亿美元伊朗加密资产，监管不确定性上升（CoinDesk）。' +
+      'XRP ETF 同期逆势净流入 3,500 万美元，资金向山寨赛道轮动（CoinDesk）。',
     sources: [
       { name: 'CoinDesk',        url: 'coindesk.com' },
+      { name: 'Investing.com',   url: 'investing.com/news/cryptocurrency-news' },
       { name: 'Alternative.me',  url: 'alternative.me/crypto/fear-and-greed-index' },
       { name: 'CoinMarketCap',   url: 'coinmarketcap.com/headlines' },
     ],
   },
   stock: {
     trend:
-      'CNN 恐惧贪婪指数 59.83（贪婪），微降自前值 60.09，贪婪区间维持。' +
-      'VIX 跌至 15.53（-6.39%），波动率大幅压缩至近期低位。' +
-      'MM 牛熊指标 68.22（前值 61.69），多头信号持续增强。' +
-      'AAII 看多 35.56%（↑自 31.72%），看空 41.85%（↓自 43.61%）。' +
-      'NAAIM 经理人仓位急升至 98.39（前值 82.02），4 周均线 88.61，标普 500 升至 7,581 点新高。',
+      'CNN 恐惧贪婪指数 60.17（贪婪），微升自 60.09。' +
+      'VIX 进一步下跌至 15.32（-7.66%），波动率压缩至年内低位，市场做多情绪显著。' +
+      'MM 牛熊指标 68.22（前值 61.69），NAAIM 经理人仓位 98.39（前值 82.02，4W均线 88.61）。' +
+      'AAII 看多 35.56%（↑），看空 41.85%（↓），散户净空头但改善中；标普 500 维持 7,580 高位。',
     cause:
-      '美伊停火谈判推进令地缘风险溢价快速消退，油价从 2026 年峰值回落逾 20%，' +
-      'VIX 随之大幅下行，标普 500 与纳斯达克同步创历史新高（CNBC）。' +
-      '美联储理事 Bowman 明确警告不应因通胀短暂回升而加息，鸽派表态为股市提供货币政策支撑（CNBC）。' +
-      'NAAIM 仓位一周急升 16 个百分点至 98.39，专业经理人极度看多，与 AAII 散户持续净空头形成两极分化。' +
-      '极端多头仓位在历史上常为短期回调预警，市场宽度是否跟上指数创新高需密切监控。',
+      '美伊停火谈判及乌克兰潜在停火预期推动九周连涨；市场聚焦新任美联储主席 Kevin Warsh' +
+      '政策立场——鹰鸽特征尚不明朗，为市场定价增添不确定性（Investing.com）。' +
+      'AI 经济正打破传统宏观指标框架，AI/半导体成为本轮最强赛道（Investing.com Market Overview）。' +
+      'NAAIM 专业经理仓位 98.39 逼近历史极值，与 AAII 散户净空头并存；' +
+      '两极分化格局历史上往往先于短期调整出现，VIX 15.32 预示尾部风险未定价。',
     sources: [
-      { name: 'CNBC Markets',  url: 'cnbc.com/markets' },
-      { name: 'NAAIM',         url: 'naaim.org/programs/naaim-exposure-index' },
-      { name: 'AAII Survey',   url: 'aaii.com/sentimentsurvey' },
+      { name: 'Investing.com Stock',    url: 'investing.com/news/stock-market-news' },
+      { name: 'Investing.com Overview', url: 'investing.com/analysis/market-overview' },
+      { name: 'NAAIM',                  url: 'naaim.org/programs/naaim-exposure-index' },
     ],
   },
   sofr: {
     trend:
-      'SOFR 利率 3.62%（截至 5 月 28 日），处于 25th 分位（3.60%）与 75th 分位（3.68%）之间，' +
-      '日成交量 3,139 亿美元，较上期小幅下降。1st 分位 3.58%，99th 分位 3.72%，分布区间稳定，' +
-      '短端资金市场运行平稳，美联储政策维持现状无转向信号。',
+      'SOFR 利率 3.62%（截至 5 月 28 日，周末无更新），处于 25th 分位（3.60%）与 75th 分位（3.68%）之间，' +
+      '日成交量 3,139 亿美元。1st 分位 3.58%，99th 分位 3.72%，' +
+      '分布区间稳定，短端资金市场平稳运行，美联储政策维持现状，无转向信号。',
   },
   rates: {
     trend:
-      '美国 10 年期收益率降至 4.434%（-5.9 bps），30 年期降至 4.974%（-5.2 bps），长端双双回落。' +
-      '加拿大 5 年期 GOC 升至 3.23%（+4 bps，前值 3.19%），CMB 升至 3.37%（+5 bps，前值 3.32%）。' +
-      'GOC/CMB 利差 14 bps 略有扩大，美债与加拿大债券方向背离，' +
-      'SOFR 3.62% 维持稳定，短端锚定效应依旧显著。',
+      '美国 10 年期收益率 4.453%（-4.0 bps），30 年期 4.993%（-3.3 bps），从近期高点 5.197%（2007 年后最高）持续回落。' +
+      '加拿大 5 年期 GOC 3.23%（+4 bps），CMB 3.37%（+5 bps）。' +
+      'GOC/CMB 利差 14 bps，SOFR 3.62% 短端锚定，美债与加债方向背离延续。',
     cause:
-      '【美债 / 长端】美伊停火谈判进展带动国债收益率下行，CNBC 报道"国债在美伊停火谈判消息后收益率回落"。' +
-      '地缘紧张情绪缓解，投资者短暂减少避险需求，美债价格上涨、收益率走低。' +
-      'Fed Bowman 反对加息立场亦减轻长端收益率上行压力。\n\n' +
-      '【SOFR / 短端】美联储维持观望，SOFR 3.62% 几乎未动；' +
-      'Bowman 措辞鸽派但未暗示近期降息，短端利率僵局延续。\n\n' +
-      '【加拿大 GOC/CMB +4-5bps】加拿大债券利率逆美债方向上行，' +
-      '反映本国经济数据与住房市场压力，CMB（+5bps）略快于 GOC（+4bps），利差小幅扩大至 14bps，' +
-      '加拿大央行宽松路径预期尚不明朗（Bank of Canada）。',
+      '【美债 / 长端】美伊停火谈判降低地缘风险溢价，美债收益率温和走低；' +
+      '新任 Fed 主席 Kevin Warsh 货币政策方向不明，Investing.com 分析指出' +
+      '"债券市场已不再相信旧有经济假设"，30Y 从 5.197% 高点回落反映短期避险买盘（Investing.com Bonds）。' +
+      '财政部加速借贷持续收紧流动性，构成长端利率上行压力。\n\n' +
+      '【SOFR / 短端】SOFR 在 3.62% 稳定，与 Fed 现持观望立场吻合；降息预期尚未实质推进。\n\n' +
+      '【加拿大 GOC/CMB】+4/+5 bps 反映上周五定价；CMB 高于 GOC 反映住房信贷溢价，BoC 宽松时间表不明朗。',
     sources: [
-      { name: 'CNBC Markets',   url: 'cnbc.com/markets' },
-      { name: 'Canada ICI',     url: 'canadaici.com/market-data' },
-      { name: 'NY Fed SOFR',    url: 'newyorkfed.org/markets/reference-rates/sofr' },
-      { name: 'Bank of Canada', url: 'bankofcanada.ca/rates' },
+      { name: 'Investing.com Bonds',    url: 'investing.com/analysis/bonds' },
+      { name: 'Investing.com Headlines', url: 'investing.com/news/headlines' },
+      { name: 'NY Fed SOFR',            url: 'newyorkfed.org/markets/reference-rates/sofr' },
+      { name: 'Bank of Canada',         url: 'bankofcanada.ca/rates' },
     ],
   },
   forex: {
     trend:
-      'USD/CAD 降至 1.3779（前值 1.3802），加元升值约 0.17%。' +
-      'USD/CNY 降至 6.7657（前值 6.7945），人民币升值约 0.43%。' +
-      'CAD/CNY 降至 4.9102（前值 4.9219），加元对人民币小幅走弱约 0.24%。' +
-      '美元整体走弱，人民币涨幅最为显著，加元弱于人民币。',
+      'USD/CAD 1.3795（前值 1.3802），加元微升约 0.05%。' +
+      'USD/CNY 6.7657（前值 6.7945），人民币升值约 0.43%。' +
+      'CAD/CNY 4.9041（前值 4.9219），加元对人民币走弱约 0.36%。' +
+      '美元对人民币明显偏弱；加元在三边格局中相对承压。',
     cause:
-      '【美元整体走弱】美伊停火谈判令地缘避险溢价消退，美元整体承压；' +
-      'Fed Bowman 明确反对加息，市场减少对美元利差优势的押注，USD 对 CAD 与 CNY 双双下行（CNBC）。\n\n' +
-      '【人民币走强】USD/CNY 下行 0.43%，高盛分析认为中国制造业主导地位支撑人民币升值趋势（CNBC）。' +
-      '油价下跌进一步缓解中国进口成本，有利于贸易顺差维持，人民币基本面改善。\n\n' +
-      '【加元相对偏弱】油价从峰值回落逾 20% 对资源货币加元形成负面影响，' +
-      '尽管 USD/CAD 下行（加元走强），但 CAD/CNY 仍小幅走弱，反映加元相对人民币的比较劣势。',
+      '【美元偏弱】伊朗 / 乌克兰潜在停火提升风险偏好，美元承压；' +
+      '摩根大通预判美元长期偏弱，因高债务与财政挑战削弱美元结构性支撑（Investing.com Forex）。' +
+      '尽管美元 5 月受高利率支撑录得月度上涨，短期在停火预期下走软。\n\n' +
+      '【人民币走强】中国制造业竞争优势支撑人民币，贸易顺差结构性支持，油价回落改善进口成本。\n\n' +
+      '【加元相对弱势】油价从峰值回落逾 20% 压制资源货币；BoC 降息路径不明令 CAD 承压；' +
+      'CAD/CNY 跌幅（-0.36%）大于 USD/CAD（-0.05%），反映加元三边相对弱势。',
     sources: [
-      { name: 'CNBC Markets',  url: 'cnbc.com/markets' },
-      { name: 'Canada ICI',    url: 'canadaici.com/market-data' },
+      { name: 'Investing.com Forex',    url: 'investing.com/news/forex-news' },
+      { name: 'Investing.com Overview', url: 'investing.com/analysis/market-overview' },
     ],
   },
 
   // ── Slide 10: 配置建议
   recs: [
-    { asset: 'BTC',          dir: '谨慎观望', isLong: null,  adj: '持平',  conviction: '低',
-      reason: 'F&G=23 极恐但 ETF 连续 9 日净流出（$28亿），新买家严重不足；今日资金流向虽全面转正，但仍需确认放量止跌（日线阳包阴 + F&G 连续 2 日回升至 30+）后方可介入' },
+    { asset: 'BTC',          dir: '谨慎做多', isLong: true,  adj: '+3%',  conviction: '低',
+      reason: 'F&G 28 从极恐区回升，CME 24/7 期货上线标志机构基础设施扩展；但 ETF 持续净流出（$20亿）且分析师警告跌势或延续，建议小仓试探，以 F&G 升破 35 为加仓信号' },
     { asset: '美股（大盘）', dir: '持有观望', isLong: null,  adj: '持平',  conviction: '中',
-      reason: 'NAAIM 仓位 98.39 逼近历史极值，一周急升 16 个百分点，极端多头仓位历史上常领先短期调整 1-2 周；建议持仓不追高，通过 VIX 看涨期权对冲集中度风险' },
+      reason: 'VIX 15.32 年内低位、NAAIM 98.39 历史极值，市场充分定价乐观预期；Kevin Warsh 政策立场不明增添不确定性，九周连涨后缺乏新催化剂，建议持仓不追高' },
     { asset: 'AI / 半导体',  dir: '增持',    isLong: true,  adj: '+5%',  conviction: '高',
-      reason: '标普与纳斯达克同步创历史新高，VIX 大幅压缩至 15.53，市场做多动能强劲；AI/半导体为本轮主线，停火谈判推进有助于全球供应链预期改善' },
+      reason: '美股九周连涨中 AI/半导体为最强赛道；AI 经济正打破传统宏观框架（Investing.com），结构性增长逻辑完整；VIX 低位期权成本低，可用 covered call 策略降低持仓成本' },
     { asset: '美债 10Y/30Y', dir: '短期持有', isLong: true,  adj: '+3%',  conviction: '中',
-      reason: '停火谈判驱动收益率小幅下行（10Y -5.9bps），但趋势可持续性取决于地缘进展；Bowman 反对加息为长端提供支撑，可短期持有，止盈于 4.38% 以下' },
+      reason: '30Y 从 5.197% 历史高位回落，收益率温和下行；停火谈判 + 短期避险买盘支撑；止盈位 10Y 4.38%，若 Warsh 鹰派转向或 CPI 超预期则快速止损' },
     { asset: '加元（CAD）',  dir: '轻度减仓', isLong: false, adj: '−3%',  conviction: '中',
-      reason: '油价从 2026 峰值回落 20%，资源货币加元中期承压；CAD/CNY 已走弱，USD/CAD 短暂下行可能是反弹而非趋势逆转，BoC 降息路径仍不明朗' },
-    { asset: '人民币资产',   dir: '关注',    isLong: null,  adj: '跟踪',  conviction: '中',
-      reason: '人民币升值 0.43% 由基本面支撑（制造业主导地位 + 油价下行改善贸易条件），高盛确认升值趋势；可逐步建立小额敞口，持续跟踪中美贸易谈判进展' },
+      reason: '油价从峰值跌 20%，CAD/CNY 三边最弱，BoC 降息路径不明；若 WTI 跌破 $80 则加速减仓，若油价企稳则重新评估' },
+    { asset: '人民币资产',   dir: '关注增持', isLong: true,  adj: '+3%',  conviction: '中',
+      reason: '制造业竞争优势支撑人民币升值，摩根大通看淡美元长期走势形成对比；油价回落改善贸易条件；可逐步建立敞口' },
   ],
 
   // ── Slide 11: 关键风险 & 观察指标
   watches: [
-    { label: '美伊停火谈判结果',
-      detail: '若停火正式落地 → 油价进一步承压，加元走软，VIX 有望降至 14 以下，美债收益率短期反弹；若谈判破裂 → VIX 快速回升至 20+，建议持有 VIX 看涨期权对冲。' },
-    { label: 'NAAIM 超买风险',
-      detail: '下周披露（6 月 3 日）：若仓位维持 95+ 则超买风险累积，历史上此区间后 2 周内标普平均回调 2-3%；若回落至 85 以下则短期调整信号缓解。' },
-    { label: 'BTC ETF 资金流向',
-      detail: '连续 9 日净流出（$28亿）是关键压制因素；若出现日度净流入且 F&G 连续 2 日升破 30，则视为反转信号；若继续净流出则确认熊市延续。' },
-    { label: '美联储 6 月议息会议',
-      detail: 'Bowman 反对加息但未暗示降息。关注：5 月 CPI 数据（6 月 11 日）与联储点阵图。若鸽派信号出现，美债收益率加速下行；若偏鹰则高仓位美股面临重新定价。' },
-    { label: '油价与加元联动',
-      detail: '油价较峰值下行 20% 对加元持续施压。关注 WTI 是否跌破 $80/桶：突破则 USD/CAD 有望重回 1.39+；若油价企稳则加元跌幅受限，配置建议需相应调整。' },
+    { label: '美伊 / 乌克兰停火谈判（本周关键）',
+      detail: '若正式停火协议落地 → 油价承压、加元走软、VIX 有望降至 14 以下，美债短期反弹；若谈判破裂 → VIX 快速回升 20+，地缘风险溢价重新定价。' },
+    { label: 'Kevin Warsh 货币政策立场明朗化',
+      detail: 'Warsh 鹰鸽特征尚不确认；Investing.com 分析指出"债券市场已不再相信旧有经济假设"。若暗示鹰派 → 长端收益率反弹，成长股承压；若鸽派确认 → VIX 进一步压缩，AI/科技继续受益。' },
+    { label: 'NAAIM 超买（6 月 3 日披露）',
+      detail: '若仓位维持 95+ 则超买风险持续累积；历史数据显示 NAAIM 98+ 后 2 周内标普平均回调 2-3%；若回落至 85 以下则调整风险缓解。' },
+    { label: 'BTC ETF 资金流向逆转',
+      detail: '连续净流出是加密下行的核心压制。三项反转信号：① 日净流入转正 ② F&G 升破 35 连续 2 日 ③ 短期资金流（15m/4h）由负转正，满足两项即为确认信号。' },
+    { label: '美联储 6 月议息 & 5 月 CPI（6/11）',
+      detail: 'Warsh 政策立场不明下，CPI 若超预期 → 收益率反弹、NAAIM 高仓位面临重新定价；若符合或低于预期 → VIX 进一步压缩，AI/半导体继续受益。' },
   ],
 };
 

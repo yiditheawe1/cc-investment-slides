@@ -8,12 +8,21 @@
 
 ### ✅ WebFetch 可直接抓取
 
-| 消息源 | URL | 抓取提示 |
-|--------|-----|----------|
-| CoinDesk | https://www.coindesk.com/ | 直接返回正文；提取 headline + date + summary |
-| Alternative.me | https://alternative.me/crypto/fear-and-greed-index/ | 返回 F&G 当前值、前日值、分类标签及方法论说明 |
-| CoinMarketCap 新闻 | https://coinmarketcap.com/headlines/ | 返回简短标题列表；内容较浅，适合补充覆盖 |
-| NAAIM 指数 | https://naaim.org/programs/naaim-exposure-index/ | 返回完整历史周表格；可计算 4W MA |
+| 消息源 | 板块 | URL | 抓取提示 |
+|--------|------|-----|----------|
+| CoinDesk | CRYPTO | https://www.coindesk.com/ | 直接返回正文；提取 headline + date + summary |
+| Alternative.me | CRYPTO | https://alternative.me/crypto/fear-and-greed-index/ | 返回 F&G 当前值、前日值、分类标签及方法论说明 |
+| CoinMarketCap 新闻 | CRYPTO | https://coinmarketcap.com/headlines/ | 返回简短标题列表；内容较浅，适合补充覆盖 |
+| NAAIM 指数 | STOCK | https://naaim.org/programs/naaim-exposure-index/ | 返回完整历史周表格；可计算 4W MA |
+| Investing.com 加密新闻 | CRYPTO | https://www.investing.com/news/cryptocurrency-news | 标题 + 日期 + 摘要；提取今日/昨日文章 |
+| Investing.com 加密分析 | CRYPTO | https://www.investing.com/analysis/cryptocurrency | 深度分析文章；提取标题 + 关键论点 |
+| Investing.com 股市新闻 | STOCK | https://www.investing.com/news/stock-market-news | S&P 500、VIX、Fed 政策相关标题 |
+| Investing.com 股市分析 | STOCK | https://www.investing.com/analysis/stock-markets | 股市深度分析；聚焦宏观叙事 |
+| Investing.com 债券分析 | 利率 | https://www.investing.com/analysis/bonds | 美债收益率、Fed 政策、加拿大利率相关分析 |
+| Investing.com 外汇新闻 | FOREX | https://www.investing.com/news/forex-news | USD/CAD、USD/CNY、油价、BoC/Fed 驱动因素 |
+| Investing.com 外汇分析 | FOREX | https://www.investing.com/analysis/forex | 外汇深度分析；提取主要货币对观点 |
+| Investing.com 市场总览 | 跨板块 | https://www.investing.com/analysis/market-overview | 宏观事件驱动多板块联动时使用；提取关键论点分配至相关板块 |
+| Investing.com 突发新闻 | 跨板块 | https://www.investing.com/news/headlines | 补充跨板块宏观/地缘事件；提取今日/昨日标题 |
 
 ### ✅ Playwright MCP 可抓取（WebFetch 返回 403/451）
 
@@ -26,15 +35,11 @@
 | 消息源 | 失败原因 | 替代方案 |
 |--------|----------|----------|
 | The Block | 403 Forbidden | 改用 CoinDesk |
-| CNN Markets | 451 Unavailable For Legal Reasons | 改用 CNBC（Playwright） |
-| Bloomberg（所有子页面） | 登录墙，Playwright 只返回导航链接 | 改用 CNBC / CoinDesk |
-| Reuters FX | `Claude Code is unable to fetch` | 改用 CNBC 外汇相关标题 |
-| MarketWatch | `Claude Code is unable to fetch` | 改用 CNBC |
+| Bloomberg（所有子页面） | 登录墙，Playwright 只返回导航链接 | 改用 Investing.com / CoinDesk |
 | Yahoo Finance /news/ | HTTP 503 | — |
 | NY Fed SOFR 页面 | 403（HTML 页面） | 改用 NY Fed JSON API（已在 investment-index-slides 脚本中） |
 | US Treasury 收益率页面 | 60 秒超时 | 改用 market-index.json 已有数据 |
 | Bank of Canada /rates/ | 只返回导航，无实际利率数据 | 只用于政策背景描述；具体利率读 market-index.json |
-| AAII sentimentsurvey | 返回空 body | 只用于描述；实际数据读 market-index.json |
 
 ---
 
@@ -109,13 +114,22 @@ WebFetch(url="https://alternative.me/crypto/fear-and-greed-index/", prompt="Curr
 ## 5. 推荐工作流（下次 session）
 
 ```
-Step 1 — 并行 WebFetch（3 个，速度快）:
-  a. CoinDesk (crypto news)
-  b. Alternative.me (crypto F&G context)
-  c. CoinMarketCap /headlines/ (crypto supplement)
+Step 1 — 并行 WebFetch（最多 9 个，全部无需 Playwright）:
+  CRYPTO:  a. CoinDesk
+           b. Alternative.me (F&G context)
+           c. CoinMarketCap /headlines/
+           d. Investing.com /news/cryptocurrency-news
+           e. Investing.com /analysis/cryptocurrency   （可选，深度分析）
+  STOCK:   f. Investing.com /news/stock-market-news
+           g. Investing.com /analysis/stock-markets    （可选）
+  利率:    h. Investing.com /analysis/bonds
+  FOREX:   i. Investing.com /news/forex-news
+  跨板块:  j. Investing.com /analysis/market-overview
+           k. Investing.com /news/headlines            （可选，突发补充）
 
-Step 2 — Playwright CNBC（1 个，覆盖 stock + rates + forex 新闻）:
+Step 2 — Playwright CNBC（若 MCP 可用，可补充 stock + rates 深度覆盖）:
   browser_navigate → wait 3s → browser_evaluate (headline extractor)
+  ⚠️ 非必须：Investing.com WebFetch 已可覆盖同类内容
 
 Step 3 — WebFetch NAAIM（如 market-index.json 数据需要最新）:
   可选；若 market-index.json 已有当日数据则跳过
@@ -124,7 +138,7 @@ Step 4 — 综合 market-index.json 数据，写 ANALYSIS 对象，运行脚本:
   node generate_investment_index_analysis.js
 ```
 
-总计：**4 次网络请求**（3 WebFetch + 1 Playwright）即可覆盖所有类别。
+最低配置（Playwright 不可用时）：**9 次 WebFetch** 即可覆盖全部 5 个分析板块。
 
 ---
 
