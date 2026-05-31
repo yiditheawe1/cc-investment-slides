@@ -495,15 +495,6 @@ async function main() {
   await pres.writeFile({ fileName: outFile });
   console.log('SUCCESS: ' + outFile);
 
-  // ── Cleanup .playwright-mcp temp files
-  const mcpDir = path.join(__dirname, '.playwright-mcp');
-  if (fs.existsSync(mcpDir)) {
-    for (const f of fs.readdirSync(mcpDir)) {
-      try { fs.unlinkSync(path.join(mcpDir, f)); } catch {}
-    }
-    console.log('Cleaned .playwright-mcp/');
-  }
-
 }
 
 main().catch(err => { console.error('FATAL:', err.message); process.exit(1); });

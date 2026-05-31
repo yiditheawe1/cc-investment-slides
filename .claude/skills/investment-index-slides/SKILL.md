@@ -20,9 +20,30 @@ Do not use any URL that is not listed in `indicators.md`. Do not invent or subst
 
 ## Execution Steps
 
-### Step 0 — Read cold_start.md  ← DO THIS FIRST, EVERY TIME
+### Step 0 — Start Playwright MCP  ← DO THIS FIRST, BEFORE ANYTHING ELSE
 
-Read `.claude/skills/investment-index-slides/cold_start.md` in full before doing anything else.
+Before reading any files or fetching any data, ensure the Playwright MCP server is running.
+
+**Check availability:**
+```
+ToolSearch({ query: "select:mcp__playwright__browser_navigate", max_results: 1 })
+```
+
+**If tools are found** → Playwright is running. Proceed to Step 1.
+
+**If tools are NOT found** → Start the server via Bash:
+```bash
+npx @playwright/mcp@latest &
+```
+Wait 3 seconds, then retry ToolSearch once. If tools are still not found after retry, proceed in **WebFetch-only mode**: skip Playwright-dependent indicators (CNN F&G · MM Bull/Bear · AAII · Canada rates · BTC Fund Flow) and reuse their existing values from `LIVE_MANUAL` in the script — do not ask the user to paste DOM.
+
+> **Root cause note**: The `.playwright-mcp/` directory in the project root is the Playwright MCP server's browser profile. Do NOT delete or modify its contents — doing so crashes the MCP server.
+
+---
+
+### Step 1 — Read cold_start.md
+
+Read `.claude/skills/investment-index-slides/cold_start.md` in full.
 
 It contains:
 - Which URLs are blocked to plain WebFetch and must use the **`playwright` MCP server** instead
@@ -34,7 +55,7 @@ It contains:
 
 **If you skip this step, you will repeat the same mistakes: ~8 wasted WebFetch calls on known-403 URLs.**
 
-### Step 1 — Read indicators.md
+### Step 2 — Read indicators.md
 
 After reading `cold_start.md`, read `.claude/skills/investment-index-slides/indicators.md` in full.
 
@@ -47,7 +68,7 @@ From it, extract for each indicator:
 
 Use only URLs and DOM selectors found in `indicators.md`. If an indicator has no usable URL, mark it `N/A`.
 
-### Step 2 — Fetch live data
+### Step 3 — Fetch live data
 
 Use the WebFetch tool on each URL found in `indicators.md`. For each indicator extract:
 - **Current value** (number, percentage, or index level)
@@ -88,7 +109,7 @@ Render as a standard card: value = 当前, change line = `"prev <前值> • <la
 
 **加密货币资金流 — BTC Fund Flow (6 values)** — WebFetch gets no data. Use Playwright MCP: navigate → wait 4s → snapshot. Save snapshot to file (output is large). Grep for `BTC BTC` row. Column order: 货币 | 5m | 15m | 1h | 2h | 4h | 6h | 8h | 1D | 7D | 30D | 市值($) | 资金信号合约?. Extract: 15m (col 3), 4h (col 6), 7D (col 10), 30D (col 11), 市值($) (col 12), 资金信号合约? (col 13). Dir: positive value = `'up'`, negative = `'down'`, 市值 = `'neutral'`.
 
-### Step 3 — Organize data
+### Step 4 — Organize data
 
 Structure the fetched data into four category objects matching the sections in `indicators.md`:
 
@@ -99,7 +120,7 @@ RATES    → US 10Y, US 30Y, Canada 5Y CMB
 FOREX    → USD/CAD, USD/CNY, CAD/CNY
 ```
 
-### Step 3.5 — `market-index.json` (written automatically by the script)
+### Step 4.5 — `market-index.json` (written automatically by the script)
 
 `generate_investment_index_slides.js` writes `market-index.json` to the project root automatically after all data is assembled — no manual Write step needed.
 
@@ -129,7 +150,7 @@ The JSON contains **all 16 indicators** (6 manual + 10 API) using the exact key 
 
 ---
 
-### Step 4 — Generate PPT using pptxgenjs
+### Step 5 — Generate PPT using pptxgenjs
 
 Use the pptx skill's pptxgenjs.md reference to write and execute a Node.js script.
 Output file: `investment-index-slides.pptx` in the current working directory.
@@ -200,7 +221,7 @@ Horizontal padding between cards: 0.15".
 Vertical padding between card rows: 0.15".
 Outer horizontal margin: 0.4" (after accent bar).
 
-### Step 5 — Update and run the script
+### Step 6 — Update and run the script
 
 1. **Read the existing `generate_investment_index_slides.js`** first. It persists between runs — do NOT rewrite it from scratch.
    - If it exists: edit only the data values (indicator numbers, dates). The functions and layout are stable.
@@ -322,7 +343,7 @@ Implement this as a dedicated `addNaaimCard(slide, x, y, w, h, data)` function. 
 { current: "82.02", prev: "77.34", ma4w: "87.46", ma4wPrev: "90.49", date: "2026-05-20" }
 ```
 
-### Step 6 — Invoke investment-index-analysis skill
+### Step 7 — Invoke investment-index-analysis skill
 
 After confirming the slides PPTX was created successfully, immediately invoke the `investment-index-analysis` skill:
 
@@ -334,7 +355,7 @@ This skill fetches corroborating news, generates fresh analysis text (市场走�
 
 **Do NOT run `generate_investment_index_analysis.js` directly** — it only re-renders stale hardcoded text. The analysis skill is what updates the content.
 
-### Step 7 — QA
+### Step 8 — QA
 
 After both files are confirmed created, report:
 - Which indicators were successfully fetched vs. N/A
