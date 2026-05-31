@@ -12,9 +12,10 @@
  * Everything else (functions, layout, colors) is stable — do NOT rewrite it.
  */
 
-const path    = require('path');
-const https   = require('https');
-const pptxgen = require(path.resolve(__dirname, '.claude/skills/pptx/node_modules/pptxgenjs'));
+const path        = require('path');
+const fs          = require('fs');
+const https       = require('https');
+const pptxgen     = require(path.resolve(__dirname, '.claude/skills/pptx/node_modules/pptxgenjs'));
 
 // ── Color palette (no # prefix — pptxgenjs rule)
 const C = {
@@ -52,42 +53,43 @@ const LIVE_MANUAL = {
   // ── CRYPTO
   fundFlow: {
     items: [
-      { label: '15m',      value: '-1,080.26万',  dir: 'down'    },
-      { label: '4h',       value: '-1.74亿',       dir: 'down'    },
-      { label: '7D',       value: '4.41亿',        dir: 'up'      },
-      { label: '30D',      value: '50.92亿',       dir: 'up'      },
-      { label: '市值($)',  value: '15,159.49亿',   dir: 'neutral' },
-      { label: '资金信号', value: '-5 流向均衡',   dir: 'down'    },
+      { label: '15m',      value: '2.80亿',       dir: 'up'      },
+      { label: '4h',       value: '2.60亿',       dir: 'up'      },
+      { label: '7D',       value: '2,746.09万',   dir: 'up'      },
+      { label: '30D',      value: '59.64亿',      dir: 'up'      },
+      { label: '市值($)',  value: '14,579.43亿',  dir: 'neutral' },
+      { label: '资金信号', value: '+38净流入',     dir: 'up'      },
     ],
-    date: 'May 27',
+    date: 'May 29',
   },
 
   // ── STOCK
-  cnnFG:  { value: '60.74', change: 'prev 60.74 • Greed', dir: 'neutral', date: 'May 27' },
+  cnnFG:  { value: '59.83', change: 'prev 60.09 • Greed', dir: 'down', date: 'May 29' },
   mm: {
     mmCurrent:    '68.22',
     mmPrev:       '61.69',
-    sp500Current: '7,519.12',
-    sp500Prev:    '7,473.47',
+    sp500Current: '7,581.00',
+    sp500Prev:    '7,563.63',
     date:         'Apr 2026',
   },
   aaii: {
-    bullCurrent: '31.72%',
-    bullPrev:    '39.32%',
-    bearCurrent: '43.61%',
-    bearPrev:    '36.61%',
-    date:        'May 21',
+    bullCurrent: '35.56%',
+    bullPrev:    '31.72%',
+    bearCurrent: '41.85%',
+    bearPrev:    '43.61%',
+    date:        'May 28',
   },
   naaim: {
-    current:  '82.02',
-    prev:     '77.34',
-    ma4w:     '87.46',
-    ma4wPrev: '90.49',
-    date:     '05/20/2026',
+    current:  '98.39',
+    prev:     '82.02',
+    ma4w:     '88.61',
+    ma4wPrev: '87.46',
+    date:     '05/27/2026',
   },
 
-  // ── RATES
-  ca5yCmb: { value: '3.29%', change: '-5 bps', dir: 'down', date: 'May 26' },
+  // ── RATES  (canadaici.com — querySelectorAll('div.widgetTableCell.field3.col3 a'))
+  ca5yGoc: { value: '3.23%', change: '+4 bps', dir: 'up', date: 'May 29' }, // index [0] GOC 5Y
+  ca5yCmb: { value: '3.37%', change: '+5 bps', dir: 'up', date: 'May 29' }, // index [2] CMB 5Y
 };
 
 // ════════════════════════════════════════════════════════════════
@@ -412,7 +414,14 @@ async function main() {
   // Summary log
   const apiKeys = ['cryptoFG','btcDom','ethBtc','sofr','vix','us10y','us30y','usdCad','usdCny','cadCny'];
   const fetched = apiKeys.filter(k => LIVE[k]).length;
-  console.log(`API: ${fetched}/10 fetched  |  manual: fundFlow · cnnFG · mm · aaii · naaim · ca5yCmb\n`);
+  console.log(`API: ${fetched}/10 fetched  |  manual: fundFlow · cnnFG · mm · aaii · naaim · ca5yGoc · ca5yCmb\n`);
+
+  // ── Write market-index.json (all 16 indicators)
+  fs.writeFileSync(
+    path.resolve(__dirname, 'market-index.json'),
+    JSON.stringify({ date: TODAY, ...LIVE }, null, 2),
+    'utf8'
+  );
 
   // ── Build presentation
   const pres = new pptxgen();
@@ -466,12 +475,13 @@ async function main() {
     5: (sl, pr, x, y, w, h) => addNaaimCard(sl, pr, x, y, w, h, LIVE.naaim),
   });
 
-  // RATES (3×1)
+  // RATES (2×2)
   categorySlide(pres, '利率  (RATES)', C.rates, [
     { name: 'US 10Y Treasury', ...LIVE.us10y   },
     { name: 'US 30Y Treasury', ...LIVE.us30y   },
+    { name: 'Canada 5Y GOC',   ...LIVE.ca5yGoc },
     { name: 'Canada 5Y CMB',   ...LIVE.ca5yCmb },
-  ], 3, 1, null);
+  ], 2, 2, null);
 
   // FOREX (3×1)
   categorySlide(pres, 'FOREX', C.forex, [
@@ -486,7 +496,6 @@ async function main() {
   console.log('SUCCESS: ' + outFile);
 
   // ── Cleanup .playwright-mcp temp files
-  const fs = require('fs');
   const mcpDir = path.join(__dirname, '.playwright-mcp');
   if (fs.existsSync(mcpDir)) {
     for (const f of fs.readdirSync(mcpDir)) {
@@ -494,6 +503,7 @@ async function main() {
     }
     console.log('Cleaned .playwright-mcp/');
   }
+
 }
 
 main().catch(err => { console.error('FATAL:', err.message); process.exit(1); });

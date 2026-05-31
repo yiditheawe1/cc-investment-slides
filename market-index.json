@@ -1,0 +1,160 @@
+{
+  "date": "2026-05-29",
+  "fundFlow": {
+    "items": [
+      {
+        "label": "15m",
+        "value": "2.80亿",
+        "dir": "up"
+      },
+      {
+        "label": "4h",
+        "value": "2.60亿",
+        "dir": "up"
+      },
+      {
+        "label": "7D",
+        "value": "2,746.09万",
+        "dir": "up"
+      },
+      {
+        "label": "30D",
+        "value": "59.64亿",
+        "dir": "up"
+      },
+      {
+        "label": "市值($)",
+        "value": "14,579.43亿",
+        "dir": "neutral"
+      },
+      {
+        "label": "资金信号",
+        "value": "+38净流入",
+        "dir": "up"
+      }
+    ],
+    "date": "May 29"
+  },
+  "cnnFG": {
+    "value": "59.83",
+    "change": "prev 60.09 • Greed",
+    "dir": "down",
+    "date": "May 29"
+  },
+  "mm": {
+    "mmCurrent": "68.22",
+    "mmPrev": "61.69",
+    "sp500Current": "7,581.00",
+    "sp500Prev": "7,563.63",
+    "date": "Apr 2026"
+  },
+  "aaii": {
+    "bullCurrent": "35.56%",
+    "bullPrev": "31.72%",
+    "bearCurrent": "41.85%",
+    "bearPrev": "43.61%",
+    "date": "May 28"
+  },
+  "naaim": {
+    "current": "98.39",
+    "prev": "82.02",
+    "ma4w": "88.61",
+    "ma4wPrev": "87.46",
+    "date": "05/27/2026"
+  },
+  "ca5yGoc": {
+    "value": "3.23%",
+    "change": "+4 bps",
+    "dir": "up",
+    "date": "May 29"
+  },
+  "ca5yCmb": {
+    "value": "3.37%",
+    "change": "+5 bps",
+    "dir": "up",
+    "date": "May 29"
+  },
+  "cryptoFG": {
+    "value": "23",
+    "change": "prev 22 • Extreme Fear",
+    "dir": "up",
+    "date": "May 28"
+  },
+  "btcDom": {
+    "value": "57.6%",
+    "change": "—",
+    "dir": "neutral",
+    "date": "May 29"
+  },
+  "ethBtc": {
+    "value": "0.02757",
+    "change": "+0.99%",
+    "dir": "up",
+    "date": "May 29"
+  },
+  "sofr": {
+    "date": "05/28",
+    "cells": [
+      {
+        "label": "RATE (%)",
+        "value": "3.62%"
+      },
+      {
+        "label": "1st %ile",
+        "value": "3.58%"
+      },
+      {
+        "label": "25th %ile",
+        "value": "3.6%"
+      },
+      {
+        "label": "75th %ile",
+        "value": "3.68%"
+      },
+      {
+        "label": "99th %ile",
+        "value": "3.72%"
+      },
+      {
+        "label": "Vol ($B)",
+        "value": "3,139"
+      }
+    ]
+  },
+  "vix": {
+    "value": "15.53",
+    "change": "-1.06 (-6.39%)",
+    "dir": "down",
+    "date": "May 29"
+  },
+  "us10y": {
+    "value": "4.434%",
+    "change": "-0.059%",
+    "dir": "down",
+    "date": "May 29"
+  },
+  "us30y": {
+    "value": "4.974%",
+    "change": "-0.052%",
+    "dir": "down",
+    "date": "May 29"
+  },
+  "usdCad": {
+    "value": "1.3779",
+    "change": "prev 1.3802",
+    "dir": "down",
+    "date": "May 29"
+  },
+  "usdCny": {
+    "value": "6.7657",
+    "change": "prev 6.7945",
+    "dir": "down",
+    "date": "May 29"
+  },
+  "cadCny": {
+    "value": "4.9102",
+    "change": "prev 4.9219",
+    "dir": "down",
+    "date": "May 29"
+  }
+}

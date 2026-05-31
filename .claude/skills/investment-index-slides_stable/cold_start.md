@@ -67,8 +67,7 @@ These return 403 to plain WebFetch but load fine in a real browser.
 | CNN Fear & Greed | https://en.macromicro.me/collections/34/us-stock-relative/50108/cnn-fear-and-greed | `div.sidebar-sec.chart-stat-lastrows li:first-child` → `.stat-val .val` / `.prev-val .val` |
 | MM Bull/Bear + S&P 500 | https://en.macromicro.me/collections/34/us-stock-relative/142681/us-mm-bull-and-bear-indicator | same sidebar pattern; li[0]=MM Bull/Bear, li[1]=S&P 500 |
 | AAII 牛熊 | https://sc.macromicro.me/charts/77072/AAII-niu-xiong-yu-biao-pu-500-guan-xi | same sidebar pattern; li[0]=看多, li[1]=看空 |
-| Canada 5Y GOC | https://www.canadaici.com/market-data/ | `querySelectorAll('div.widgetTableCell.field3.col3 a')[0]` → GOC 5Y (e.g. `3.19%`) |
-| Canada 5Y CMB | https://www.canadaici.com/market-data/ | `querySelectorAll('div.widgetTableCell.field3.col3 a')[2]` → CMB 5Y (e.g. `3.32%`) ⚠️ index [0] is GOC, not CMB |
+| Canada 5Y CMB | https://www.canadaici.com/market-data/ | `div.widgetTableCell.field3.col3 a` → e.g. `3.34%` |
 
 > **SOFR removed from this list** — now auto-fetched via the official NY Fed JSON API inside the main script.
 
@@ -142,26 +141,18 @@ Angular app — `table.p-datatable-table`. First `tbody tr` = latest date.
 
 ---
 
-### Pattern C — Canada 5Y GOC & CMB (canadaici.com)
+### Pattern C — Canada 5Y CMB (canadaici.com)
 
-Dynamic widget. The page has two sections: **GOC Yields** first, then **CMB**. All yield links share the same selector class, so index matters critically:
-
-```
-querySelectorAll('div.widgetTableCell.field3.col3 a')
-  [0] → GOC 5-Year  (e.g. 3.19%)
-  [1] → GOC 10-Year
-  [2] → CMB 5-Year  (e.g. 3.32%)  ← this is what you want for Canada 5Y CMB
-  [3] → CMB 10-Year
-  [4] → CORRA 1-Month
-  [5] → CORRA 3-Month
-  [6] → Prime Rate
-  [7] → Next BoC announcement
+Dynamic widget — value in:
+```html
+<div class="widgetTableCell field3 col3 down material-symbols-outlined" ...>
+  <a ...>3.34%</a>   <!-- ← this is the CMB yield -->
+</div>
 ```
 
-To extract with section context use `browser_evaluate` with `.closest('.Section')` and `.closest('.TableRow')` for prev/BPS values.
+**Selector:** `div.widgetTableCell.field3.col3 a`
 
 > ⚠️ The Bank of Canada API (`V80691335`) returns conventional 5-year **mortgage rate** (~6%), NOT the CMB yield (~3%). Do not substitute.
-> ⚠️ Using index [0] alone returns GOC, not CMB — always use index [2] for CMB.
 
 ---
 
@@ -198,7 +189,7 @@ Slide 1: CRYPTO  — gcell(2, 2)  → 2×2 grid, 4 cards
 Slide 2: STOCK   — gcell(3, 2)  → 3×2 grid, 6 slots
   Row 0: Fear&Greed | VIX | MM Bull/Bear
   Row 1: SOFR      | AAII 牛熊  | NAAIM
-Slide 3: 利率     — gcell(2, 2)  → 2×2 grid, 4 cards (US10Y · US30Y · CA5YGOC · CA5YCMB)
+Slide 3: 利率     — gcell(3, 1)  → 3×1 row, 3 cards
 Slide 4: Forex    — gcell(3, 1)  → 3×1 row, 3 cards
 ```
 
@@ -260,7 +251,7 @@ Fetch in sequence (Playwright is stateful — one browser tab at a time):
 1. CNN F&G → https://en.macromicro.me/collections/34/us-stock-relative/50108/cnn-fear-and-greed
 2. MM Bull/Bear → https://en.macromicro.me/collections/34/us-stock-relative/142681/us-mm-bull-and-bear-indicator
 3. AAII → https://sc.macromicro.me/charts/77072/AAII-niu-xiong-yu-biao-pu-500-guan-xi
-4. Canada 5Y GOC + CMB → https://www.canadaici.com/market-data/
+4. Canada 5Y CMB → https://www.canadaici.com/market-data/
 5. 加密货币资金流 (BTC) → https://coinank.com/zh/fund/fundSwap
 
 If Playwright also fails (CAPTCHA / login wall), mark N/A and continue — do NOT ask the user for DOM paste.
@@ -274,8 +265,7 @@ cnnFG    → { value, change, dir, date }
 mm       → { mmCurrent, mmPrev, sp500Current, sp500Prev, date }
 aaii     → { bullCurrent, bullPrev, bearCurrent, bearPrev, date }
 naaim    → { current, prev, ma4w, ma4wPrev, date }
-ca5yGoc  → { value, change, dir, date }   ← querySelectorAll(...)[0] from canadaici.com (GOC 5Y)
-ca5yCmb  → { value, change, dir, date }   ← querySelectorAll(...)[2] from canadaici.com (CMB 5Y)
+ca5yCmb  → { value, change, dir, date }
 fundFlow → { date, items: [{label, value, dir}×6] }
            labels: '15m' | '4h' | '7D' | '30D' | '市值($)' | '资金信号'
            dir: 'up' (positive) | 'down' (negative) | 'neutral' (市值)
@@ -287,8 +277,6 @@ cd "e:\CC项目" && node generate_investment_index_slides.js
 ```
 
 The script prints `API: X/10 fetched` then `SUCCESS: investment-index-slides_YYYY_MM_DD.pptx`.
-
-After the slides script completes, **invoke the `investment-index-analysis` Claude skill** (via `Skill` tool). That skill fetches news, updates the `ANALYSIS` block in `generate_investment_index_analysis.js`, and generates `market-change-analysis_YYYY_MM_DD.pptx` with fresh content. **Do NOT run `generate_investment_index_analysis.js` directly** — it only re-renders stale hardcoded text.
 
 > `fetch_live_data.js` is now obsolete — the API logic lives inside the main script.
 > Do NOT run `fetch_live_data.js` or use it to patch the LIVE block.
@@ -319,7 +307,6 @@ After the slides script completes, **invoke the `investment-index-analysis` Clau
 | SOFR FRED also 403 | fred.stlouisfed.org also blocked | Use NY Fed via Playwright MCP |
 | aaii.com returns empty | aaii.com/sentimentsurvey serves blank body to WebFetch | Use macromicro.me chart 77072 via Playwright MCP |
 | canadaici.com page dynamic | WebFetch gets no data | Use Playwright MCP for `div.widgetTableCell.field3.col3 a` |
-| GOC confused with CMB | `querySelectorAll(...)[0]` returns GOC 5Y (3.19%), not CMB 5Y (3.32%) — same CSS class for all rows | Use index [2] for CMB 5Y; index [0] for GOC 5Y. Page order: GOC5Y[0] · GOC10Y[1] · CMB5Y[2] · CMB10Y[3] |
 | coinank.com dynamic | WebFetch gets no usable data | Use Playwright MCP: navigate → wait 4s → `browser_evaluate` (preferred, ~2× faster) or `browser_snapshot({ filename: "coinank_snapshot.md" })` + Grep for `BTC BTC` row |
 | coinank snapshot too large to inline | Full `browser_snapshot()` returns 2000+ lines — floods context and slows parsing | Always pass `filename: "coinank_snapshot.md"` to save to file, then `Grep pattern: "BTC BTC"` to extract just the row; or use `browser_evaluate` to skip the snapshot entirely |
 | pptxgenjs `#` in colors | Silently ignored, colors not applied | Strip `#` from all hex strings |

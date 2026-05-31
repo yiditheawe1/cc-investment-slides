@@ -78,7 +78,7 @@ Render as a standard card: value = 当前, change line = `"prev <前值> • <la
 - **c. 4W MA 当前** — average of the 4 most recent mean values
 - **d. 4W MA 前值** — average of weeks 2–5
 
-**SOFR (6 values required)** — Auto-fetched via NY Fed JSON API (`markets.newyorkfed.org/api/rates/secured/sofr/last/1.json`) inside the main script. No Playwright needed. `refRates[0]` contains: `effectiveDate` / `percentRate` / `percentPercentile1` / `percentPercentile25` / `percentPercentile75` / `percentPercentile99` / `volumeInBillions`.
+**SOFR (6 values required)** — WebFetch returns 403. Use Playwright MCP: `browser_navigate` → `browser_wait_for({ selector: "table" })` → `browser_snapshot`. First tbody row = DATE · RATE · 1st%ile · 25th%ile · 75th%ile · 99th%ile · Vol($B).
 
 **Canada 5Y CMB** — JS-rendered, WebFetch gets no data. Use Playwright MCP: navigate → wait 4s → snapshot. Look for `div.widgetTableCell.field3.col3 a` value (e.g. `3.34%`).
 
@@ -98,36 +98,6 @@ STOCK    → Fear&Greed, VIX, MM Bull/Bear, SOFR, AAII, NAAIM
 RATES    → US 10Y, US 30Y, Canada 5Y CMB
 FOREX    → USD/CAD, USD/CNY, CAD/CNY
 ```
-
-### Step 3.5 — `market-index.json` (written automatically by the script)
-
-`generate_investment_index_slides.js` writes `market-index.json` to the project root automatically after all data is assembled — no manual Write step needed.
-
-The JSON contains **all 16 indicators** (6 manual + 10 API) using the exact key names from the script:
-
-```json
-{
-  "date": "YYYY-MM-DD",
-  "cryptoFG":  { "value": "...", "change": "...", "dir": "...", "date": "..." },
-  "btcDom":    { "value": "...", "change": "...", "dir": "...", "date": "..." },
-  "ethBtc":    { "value": "...", "change": "...", "dir": "...", "date": "..." },
-  "sofr":      { "date": "...", "cells": [ { "label": "RATE (%)", "value": "..." }, "..." ] },
-  "vix":       { "value": "...", "change": "...", "dir": "...", "date": "..." },
-  "us10y":     { "value": "...", "change": "...", "dir": "...", "date": "..." },
-  "us30y":     { "value": "...", "change": "...", "dir": "...", "date": "..." },
-  "usdCad":    { "value": "...", "change": "...", "dir": "...", "date": "..." },
-  "usdCny":    { "value": "...", "change": "...", "dir": "...", "date": "..." },
-  "cadCny":    { "value": "...", "change": "...", "dir": "...", "date": "..." },
-  "fundFlow":  { "date": "...", "items": [ { "label": "15m", "value": "...", "dir": "..." }, "..." ] },
-  "cnnFG":     { "value": "...", "change": "...", "dir": "...", "date": "..." },
-  "mm":        { "mmCurrent": "...", "mmPrev": "...", "sp500Current": "...", "sp500Prev": "...", "date": "..." },
-  "aaii":      { "bullCurrent": "...", "bullPrev": "...", "bearCurrent": "...", "bearPrev": "...", "date": "..." },
-  "naaim":     { "current": "...", "prev": "...", "ma4w": "...", "ma4wPrev": "...", "date": "..." },
-  "ca5yCmb":   { "value": "...", "change": "...", "dir": "...", "date": "..." }
-}
-```
-
----
 
 ### Step 4 — Generate PPT using pptxgenjs
 
@@ -202,7 +172,7 @@ Outer horizontal margin: 0.4" (after accent bar).
 
 ### Step 5 — Update and run the script
 
-1. **Read the existing `generate_investment_index_slides.js`** first. It persists between runs — do NOT rewrite it from scratch.
+1. **Read the existing `generate_slides.js`** first. It persists between runs — do NOT rewrite it from scratch.
    - If it exists: edit only the data values (indicator numbers, dates). The functions and layout are stable.
    - If it does not exist: write it fresh using the template in `cold_start.md` Section 5.
 2. Run it with: `node generate_investment_index_slides.js`
@@ -322,26 +292,14 @@ Implement this as a dedicated `addNaaimCard(slide, x, y, w, h, data)` function. 
 { current: "82.02", prev: "77.34", ma4w: "87.46", ma4wPrev: "90.49", date: "2026-05-20" }
 ```
 
-### Step 6 — Invoke investment-index-analysis skill
+### Step 6 — QA
 
-After confirming the slides PPTX was created successfully, immediately invoke the `investment-index-analysis` skill:
-
-```
-Skill({ skill: 'investment-index-analysis' })
-```
-
-This skill fetches corroborating news, generates fresh analysis text (市场走势、原因分析、配置建议、关键风险&观察指标), updates `generate_investment_index_analysis.js`, and produces an updated `market-change-analysis_YYYY_MM_DD.pptx`.
-
-**Do NOT run `generate_investment_index_analysis.js` directly** — it only re-renders stale hardcoded text. The analysis skill is what updates the content.
-
-### Step 7 — QA
-
-After both files are confirmed created, report:
+After generation, report:
 - Which indicators were successfully fetched vs. N/A
-- Both output file paths (`investment-index-slides_*.pptx` and `market-change-analysis_*.pptx`)
+- The output file path
 - Any errors encountered
 
-Do NOT open or preview the files — just report their paths.
+Do NOT open or preview the file — just report its path.
 
 ---
 

@@ -31,8 +31,7 @@
 |-----------|--------------|-------------------|
 | U.S. 10 Year Treasury | `fetch_live_data.js` | API: https://query1.finance.yahoo.com/v8/finance/chart/%5ETNX?interval=1d&range=5d — `chart.result[0].meta.regularMarketPrice` / `chartPreviousClose` |
 | U.S. 30 Year Treasury | `fetch_live_data.js` | API: https://query1.finance.yahoo.com/v8/finance/chart/%5ETYX?interval=1d&range=5d — `chart.result[0].meta.regularMarketPrice` / `chartPreviousClose` |
-| Canada 5-year GOC | `Playwright MCP` | https://www.canadaici.com/market-data/ — `querySelectorAll('div.widgetTableCell.field3.col3 a')[0]` → GOC 5Y (e.g. `3.19%`). Also extract `[1]` for prev + BPS from `.TableRow` sibling cells. |
-| Canada 5-year CMB | `Playwright MCP` | https://www.canadaici.com/market-data/ — `querySelectorAll('div.widgetTableCell.field3.col3 a')[2]` → CMB 5Y (e.g. `3.32%`). ⚠️ Do NOT use index [0] — that is GOC, not CMB. Page order: GOC 5Y [0] · GOC 10Y [1] · CMB 5Y [2] · CMB 10Y [3]. |
+| Canada 5-year CMB | `Playwright MCP` | https://www.canadaici.com/market-data/ — extract from `div.widgetTableCell.field3.col3 a` (dynamic page; value example: `3.34%`) |
 
 ## Forex
 
