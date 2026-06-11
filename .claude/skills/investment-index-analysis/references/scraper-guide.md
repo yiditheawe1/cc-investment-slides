@@ -68,6 +68,12 @@ async () => {
 > **Fallback** (only if evaluate returns empty): older MCP builds reject `async` functions. Run
 > `browser_wait_for({ time: 3 })` once, then re-run a plain `() => {...}` (sync) version.
 
+⚡ **Hard cap: ≤2 evaluate attempts per source** (the documented one + the single fallback). Do **not**
+iterate on selectors, re-navigate, or "debug" a page — if it's still empty after the fallback, **omit
+that key and move to the next source**. Tweaking selectors mid-run is the main source of wasted calls
+and wall-time; the selectors here are verified, so an empty result means the source is blocked, not
+that the selector is wrong.
+
 ---
 
 ## 3. Per-source patterns
