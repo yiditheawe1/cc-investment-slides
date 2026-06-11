@@ -18,8 +18,8 @@
    `fundFlow`), compare its `date` against the top-level `date`. If a manual indicator's date is
    **earlier than today**, it was carried forward — write its trend line as
    `"…（数据截至 <date>，待刷新）"`. Never present stale numbers as today's.
-3. **Phase A** — fetch the **core 9** WebFetch URLs as ONE parallel batch (§2). This dominates the
-   run's wall-time — issue them all in a single message, never in sequential groups.
+3. **Phase A** — fetch all **12** WebFetch URLs as ONE parallel batch (§2). Batching (not count) is the
+   lever — issue them all in a single message, never in sequential groups.
 4. **Phase B** — **default SKIP.** Only run Playwright for a category still under 2 usable Phase-A
    sources, hard-capped at **≤2 sources total**. Sequential, 2 calls each, `browser_evaluate` only.
 5. **Synthesize** per category (rules in §3), update `recs`/`watches` only if criteria in §4 are met.
@@ -48,23 +48,28 @@ Slide 7 combines SOFR + 利率 cause into the `rates.cause` block.
 
 ## 2. Sources
 
-### Phase A — WebFetch the CORE 9 in ONE parallel batch  ⚡ (perf-critical)
+### Phase A — WebFetch all 12 in ONE parallel batch  ⚡ (perf-critical)
 
-WebFetch is slow (each call = network fetch + an LLM extraction pass), so the run's wall-time is
-dominated by this step. **Issue all core URLs as ONE message of parallel WebFetch calls** — never in
-sequential groups. The core 9 already give ≥2 sources for every category, so **Phase B is normally
-skipped** (see below). Each Investing.com page is multi-article and supports claims across several
-categories, so 9 fetches yield plenty of cross-validation material.
+**The speed lever here is batching, not count.** Because the calls run concurrently, wall-time ≈ the
+slowest single fetch whether you send 9 or 12 — so we keep broad coverage and just enforce parallelism.
+**Issue ALL of these as ONE message of parallel WebFetch calls** — never in sequential groups (that was
+the actual Phase-A slowdown). These give ≥3 sources for every category, so **Phase B is normally
+skipped** (see below).
 
 Prompt template per URL: *"Extract up to 5 of the most recent articles (today or yesterday only,
 relative to {DATE}). For each: `• Headline | Date | 1-sentence summary (≤20 words)`. Skip anything
 older than 2 days. ≤80 words total per source. No raw HTML, no commentary."*
 
 ```
-CORE 9 (one parallel batch):
+ONE parallel batch (12 URLs):
   CRYPTO:  https://www.coindesk.com/
-           https://alternative.me/crypto/fear-and-greed-index/
-  STOCK:   https://www.investing.com/analysis/stock-markets
+           https://www.investing.com/news/cryptocurrency-news
+           https://www.investing.com/analysis/cryptocurrency
+           https://alternative.me/crypto/fear-and-greed-index/     (DATA ONLY — the F&G number, not a
+                                                                     causal source; doesn't count toward
+                                                                     the ≥2-source bar for Phase B)
+  STOCK:   https://www.investing.com/news/stock-market-news
+           https://www.investing.com/analysis/stock-markets
            https://naaim.org/programs/naaim-exposure-index/
   利率:    https://www.investing.com/analysis/bonds
            https://www.investing.com/analysis/market-overview      (also covers 跨板块 macro)
@@ -73,16 +78,14 @@ CORE 9 (one parallel batch):
   跨板块:  https://www.investing.com/news/headlines
 ```
 
-**Optional extras** — add to the SAME batch only if you already know a category will be thin (rare):
-`coinmarketcap.com/headlines`, `investing.com/news/cryptocurrency-news`,
-`investing.com/analysis/cryptocurrency`, `investing.com/news/stock-market-news`. Don't add them by
-default — they overlap heavily with the core and just cost time.
+Only `coinmarketcap.com/headlines` is dropped from the old set (self-described shallow/overlapping).
+Add it to the batch only if CRYPTO somehow comes back thin — rarely needed.
 
 ### Phase B — Playwright (DEFAULT: SKIP)  ⚡
 
 Phase B is the second-biggest time sink: each news site is a heavy `browser_navigate` (5–15s load) +
 evaluate. **Skip Phase B entirely** when every category already has ≥2 usable Phase-A sources — which
-is the normal case with the core 9. Only fall through to Phase B for a category still under 2 sources,
+is the normal case with the 12-source batch. Only fall through to Phase B for a category still under 2 sources,
 and then obey a **hard cap of ≤2 Playwright sources for the whole run**. Sequential, **2 calls each**
 (`browser_navigate` → `browser_evaluate`), **never `browser_snapshot`**. Pick from, in priority order:
 
@@ -126,10 +129,10 @@ indicator; factual, no editorializing. Append stale flags from §0.2 where appli
 - Only one source → append "(单一来源，待交叉验证)".
 - Every causal claim cites ≥1 named source. Prefer today > yesterday, data > vague headline.
 
-**c. `sources`** — **2–4 entries** `{ name, url }` (3 preferred); include only sources that contributed
-a cited claim. **2 well-cross-validated sources is acceptable — do NOT run Phase B just to pad the
-count.** Use hostname-style URLs (e.g. `cnbc.com/markets`). Bloomberg only if a headline directly
-informed a point.
+**c. `sources`** — **3–5 entries** `{ name, url }` (the 12-source batch makes 3+ easy without Phase B);
+include only sources that contributed a cited claim. 2 is the floor if a category is genuinely sparse —
+but don't run Phase B *purely* to pad the count. Use hostname-style URLs (e.g. `cnbc.com/markets`).
+Bloomberg only if a headline directly informed a point.
 
 SOFR has a `trend` block only (no cause/sources) — its drivers fold into `rates.cause`.
 

@@ -100,12 +100,12 @@ Spawn a `general-purpose` agent with this prompt:
 > `E:\CC项目\market-index.json` (your numbers + stale-check source) and the existing
 > `E:\CC项目\analysis-data.json` (your recs/watches baseline). For any manual indicator whose `date`
 > is earlier than the top-level `date`, write its trend as "（数据截至 X，待刷新）". Phase A: WebFetch
-> the **core 9** URLs (guide §2) in **ONE parallel batch** — this dominates wall-time, so never fetch
+> all **12** URLs (guide §2) in **ONE parallel batch** — batching is the speed lever, so never fetch
 > them sequentially. Phase B: **default SKIP** — only run Playwright for a category still under 2
-> usable sources, hard-capped at **≤2 sources total** (sequential, 2 calls/source, `browser_evaluate`
-> only; never `browser_snapshot`). Synthesize per category — `trend` ≤80字 using only market-index.json
-> numbers; `cause` ≤150字 with cross-validation (≥2 sources = consensus, single source =
-> "(单一来源，待交叉验证)"); `sources` 2–4 `{name,url}` (2 cross-validated is fine — don't pad). Keep `recs`/`watches` unchanged unless
+> usable sources (note `alternative.me` is data-only, not a causal source), hard-capped at **≤2 sources
+> total** (sequential, 2 calls/source, `browser_evaluate` only; never `browser_snapshot`). Synthesize
+> per category — `trend` ≤80字 using only market-index.json numbers; `cause` ≤150字 with cross-validation
+> (≥2 sources = consensus, single source = "(单一来源，待交叉验证)"); `sources` 3–5 `{name,url}`. Keep `recs`/`watches` unchanged unless
 > a material reversal occurred (criteria in the guide). Write `E:\CC项目\analysis-data.json` matching
 > the guide's schema exactly, self-check it parses, then call `browser_close()` as your **final
 > action** (do this even if synthesis hit problems — it leaves the session clean for the next run;
