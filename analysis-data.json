@@ -1,0 +1,173 @@
+{
+  "crypto": {
+    "trend": "Crypto F&G 12（极度恐惧），较前值 9 微升仍深处恐惧区。BTC 主导率 56.2%，ETH/BTC -0.38% 至 0.02639，山寨持续承压。资金流：15m +3.34亿↑，4h +7.23亿↑，7D +15.12亿↑（转正），30D -101.54亿↓；资金信号大幅改善至 +55强势流入，短期资金面明显好转，与极度恐惧情绪背离。",
+    "cause": "地缘风险与 CPI 4.2% 双重压制维持极度恐惧——CNBC 确认 BTC 随 Dow 跌 900 点同步下行，Investing.com 加密分析指出BTC 受通胀、美伊冲突、AI 板块流动性外溢三重压制。CryptoQuant 预测 BTC 底部区间 $53,600，需求持续\"深度不利\"（The Block）；SpaceX IPO 或成 BTC 新抛压来源（The Block，单一来源，待交叉验证）。但资金面出现重要矛盾信号：资金信号从 +8 急升至 +55强势流入，7D 净流入 +15.12亿（转正）——CoinDesk 报道 BlackRock/Fidelity 主导 ETF 市场，机构持续逢低吸筹；Bitmine 增持 4,100 万美元 ETH（The Block）。Alternative.me 与 CoinMarketCap 双源确认 F&G 仍处极度恐惧区，资金信号改善满足底部确认条件之一，但 F&G 升破 35 尚需观察。",
+    "sources": [
+      {
+        "name": "CoinDesk",
+        "url": "coindesk.com"
+      },
+      {
+        "name": "CoinMarketCap",
+        "url": "coinmarketcap.com/headlines"
+      },
+      {
+        "name": "Investing.com Crypto",
+        "url": "investing.com/analysis/cryptocurrency"
+      },
+      {
+        "name": "Alternative.me",
+        "url": "alternative.me/crypto/fear-and-greed-index"
+      },
+      {
+        "name": "The Block",
+        "url": "theblock.co"
+      }
+    ]
+  },
+  "stock": {
+    "trend": "CNN F&G 27.46（前值 28.97），持续下行，仍处恐惧区间（25–44）。VIX +44.29% 至 22.22，波动率进一步扩张，逼近极端警戒区（25）。S&P 500 7,266.99（前值 7,323.84，-0.77%），Dow 单日跌幅 900+ 点（CNBC 确认）。NAAIM 经理人仓位 86.82（前值 98.39，Jun 3 周数据），4W MA 86.14（前值 88.61）持续下行。AAII 看空 37.00% > 看多 36.26%（Jun 4 周数据），轻度偏空。MM 牛熊 72.12（5月数据）。",
+    "cause": "CPI 4.2% YoY（三年最高）与美伊冲突升级为本日双核驱动——CNBC 与 Investing.com 双源确认联储加息预期重定价，Dow 跌 900+ 点。科威特关闭领空，以色列警告黎巴嫩（CNBC），芯片板块领跌拖累科技指数。CNN Business 报道市场出现短暂分化——\"部分个股开始无视伊战\"，但 Investing.com 股市分析指出技术卖出信号仍在多板块蔓延，VIX +44.29% 至 22.22 印证极端恐慌尚未消退。CNBC 引述 Cramer \"人工通胀\"说法——Investing.com 市场总览同日指出 CPI 4.2% 为三年最高，是否峰值市场尚无共识，信号分歧。FOMC 6/17-18（Warsh 首秀）为下一政策关键节点。",
+    "sources": [
+      {
+        "name": "CNBC Markets",
+        "url": "cnbc.com/markets"
+      },
+      {
+        "name": "CNN Business",
+        "url": "cnn.com/business/investing"
+      },
+      {
+        "name": "Investing.com Analysis",
+        "url": "investing.com/analysis/stock-markets"
+      },
+      {
+        "name": "Investing.com Overview",
+        "url": "investing.com/analysis/market-overview"
+      },
+      {
+        "name": "Investing.com News",
+        "url": "investing.com/news/stock-market-news"
+      }
+    ]
+  },
+  "sofr": {
+    "trend": "SOFR 3.60%（截至 06/09），较前值 3.63% 下行 3 bps，短端资金成本小幅松动。分布：1st 分位 3.56%，25th 分位 3.59%，75th 分位 3.65%，99th 分位 3.69%；成交量 3,063 亿美元（较前值 3,115 亿微降）。CPI 4.2% 超预期背景下短端仍无流动性紧张信号，短端与长端走势分化——联储政策锚保持稳定，未见紧急收紧迹象。"
+  },
+  "rates": {
+    "trend": "美国 10Y 升至 4.542%（+0.065%），30Y 升至 5.025%（+0.047%），双双续创近期高位，30Y 稳守 5% 上方。加拿大 5Y GOC -3 bps 至 3.20%（前值 3.23%），CMB -3 bps 至 3.35%（前值 3.38%），与美债方向持续背离。SOFR 3.60%（06/09）短端稳定，GOC/CMB 利差 15 bps 稳定。",
+    "cause": "CPI 4.2% YoY（三年最高）确认通胀复燃，触发联储加息预期重定价——CNBC 与 Investing.com 债券分析双源确认收益率上行：10Y +6.5bps/30Y +4.7bps 进一步扩大。Investing.com 债券分析指出\"油价失控环境下美元与欧元利率均难以跟随油价回落\"，通胀与地缘（美伊冲突）双重驱动长端。Investing.com 市场总览报道 ECB 决议与美伊同时博弈，全球央行政策分歧加速。加拿大 GOC/CMB 同步 -3bps，与美债方向背离——BoC 降息路径主导，BoC vs Fed 路径分歧持续扩大；GOC/CMB 利差 15 bps 稳定。SOFR 3.60% 短端稳定，短端与长端分化，联储政策锚稳定无紧急收紧信号。",
+    "sources": [
+      {
+        "name": "CNBC Markets",
+        "url": "cnbc.com/markets"
+      },
+      {
+        "name": "Investing.com Bonds",
+        "url": "investing.com/analysis/bonds"
+      },
+      {
+        "name": "Investing.com Overview",
+        "url": "investing.com/analysis/market-overview"
+      },
+      {
+        "name": "Investing.com News",
+        "url": "investing.com/news/stock-market-news"
+      }
+    ]
+  },
+  "forex": {
+    "trend": "USD/CAD 升至 1.3935（前值 1.3906，+0.21%），加元续弱。USD/CNY 升至 6.7741（前值 6.7735，+0.01%），人民币相对抗跌。CAD/CNY 降至 4.8599（前值 4.8703，-0.21%），加元相对人民币持续走弱。CPI 4.2% + 美伊冲突驱动短期避险需求，美元升值幅度温和，人民币贬值远小于加元。",
+    "cause": "CPI 4.2% 上调联储加息预期，Investing.com 外汇新闻确认\"联储加息押注削弱美元贬值叙事\"，非美货币承压。CNBC 引述经济学家\"美元对亚洲 FX 中期偏弱\"——短期加息叙事 vs 中期走弱叙事分歧持续，信号分化。美伊冲突升级叠加 CPI，原油上涨理论上短期可边际支撑加元，但 BoC 降息路径 vs Fed 加息预期的利率差逆风压倒性——Investing.com 外汇分析印证 USD/CAD 上行逻辑。若 EUR/USD 持续受压（Investing.com：可能跌穿 1.1500），美元对非商品货币强势或延续；人民币相对抗跌（USD/CNY +0.01% vs USD/CAD +0.21%），CNBC \"美元对亚洲 FX 中期偏弱\"印证人民币韧性（单一来源）。",
+    "sources": [
+      {
+        "name": "CNBC Markets",
+        "url": "cnbc.com/markets"
+      },
+      {
+        "name": "Investing.com Forex News",
+        "url": "investing.com/news/forex-news"
+      },
+      {
+        "name": "Investing.com Forex",
+        "url": "investing.com/analysis/forex"
+      },
+      {
+        "name": "Investing.com Overview",
+        "url": "investing.com/analysis/market-overview"
+      }
+    ]
+  },
+  "recs": [
+    {
+      "asset": "BTC",
+      "dir": "谨慎/短线观察",
+      "isLong": false,
+      "adj": "-1%",
+      "conviction": "低-中",
+      "reason": "F&G 12（极度恐惧），CPI 4.2% + 美伊冲突维持宏观压制（CNBC）；CryptoQuant 预测底部 $53,600（The Block）。但反转确认三项条件现已满足 1/3：① F&G 升破35（未）② 7D资金流转正（已满足：+15.12亿↑）③ 地缘/通胀降温（未）。资金信号 +55强势流入，BlackRock/Fidelity ETF 持续主导（CoinDesk）。SpaceX IPO 潜在抛压（单一来源，The Block）。等待 F&G 连续2日升破35 + 地缘降温再提升仓位"
+    },
+    {
+      "asset": "美股（大盘）",
+      "dir": "谨慎/减仓",
+      "isLong": false,
+      "adj": "-3%",
+      "conviction": "中",
+      "reason": "VIX +44.29% 至 22.22（续创新高），逼近极端警戒区（25）；CPI 4.2%（三年最高）触发加息预期，Dow 跌 900+ 点（CNBC）。四重压力：通胀 + 美伊升级 + 芯片领跌 + 技术卖出信号蔓延（Investing.com）。FOMC（6/17-18，Warsh 首秀）为下一关键风险节点。等待 VIX 回落至 18 以下 + CPI 趋势下行再重新评估"
+    },
+    {
+      "asset": "AI / 半导体",
+      "dir": "观察/暂缓",
+      "isLong": null,
+      "adj": "0%",
+      "conviction": "低",
+      "reason": "CPI 超预期推高实际利率，AI 估值系统性承压；多板块技术卖出信号蔓延（Investing.com）。Amazon 再增 175亿美元 AI 资本开支（MarketWatch）——企业端长期逻辑不变，但短期市场需消化高利率估值压制。等待 VIX 降至 15 以下 + CPI 趋势确认下行再介入"
+    },
+    {
+      "asset": "美债 10Y/30Y",
+      "dir": "减仓/规避久期",
+      "isLong": false,
+      "adj": "-3%",
+      "conviction": "中",
+      "reason": "CPI 4.2% 确认通胀复燃，30Y 5.019%（+0.041%），10Y 4.536%（+0.059%），长端溢价加速扩大；加息预期重定价进行中（CNBC）。Investing.com 债券分析确认\"坏消息尚未完全定价\"。FOMC（6/17-18）若 Warsh 鸽派则 30Y 暂稳；若鹰派则加速升破 5.2%。等待 30Y 企稳于 5% 以下再重新评估久期"
+    },
+    {
+      "asset": "加元（CAD）",
+      "dir": "减仓",
+      "isLong": false,
+      "adj": "-2%",
+      "conviction": "中",
+      "reason": "USD/CAD +0.28%，加元双重承压延续：BoC 降息路径 vs. Fed 加息预期上调；GOC/CMB 收益率今日逆转下行（-3 bps），与美债背离，BoC 宽松叙事重占主导。油价上行风险（美伊冲突）短期可能边际支撑加元，但利率差扩大中期压力持续（Investing.com 外汇分析）"
+    },
+    {
+      "asset": "人民币资产",
+      "dir": "中性关注",
+      "isLong": null,
+      "adj": "持平",
+      "conviction": "低",
+      "reason": "人民币相对抗跌（USD/CNY +0.07% vs USD/CAD +0.28%），贸易顺差与政策稳汇提供支撑（Investing.com 外汇双源印证）。CPI 超预期对 CNY 直接冲击有限；中性持有，FOMC 鸽派或贸易改善信号可转增持"
+    }
+  ],
+  "watches": [
+    {
+      "label": "美伊军事冲突持续升级——特朗普宣布更多打击，Dow 跌 700 点",
+      "detail": "特朗普宣布将\"非常猛烈地打击伊朗\"（CNBC）。美伊冲突已从地缘背景噪音升级为市场定价中心变量，叠加 CPI 4.2% 双重打压，Dow 单日跌 700 点。升级路径：油价重上 $110+，VIX 升破 25，30Y 升破 5.2%，加元商品货币波动加剧。降级路径（对冲）：停火消息 → 油价回落、风险资产阶段性反弹。每日地缘动态为最优先观察事件。"
+    },
+    {
+      "label": "CPI 4.2% 已落地（三年最高）——Warsh FOMC（6/17-18）为下一关键节点",
+      "detail": "CPI 4.2% YoY 已于 6/10 确认（CNBC + MarketWatch），为三年来最高，市场随即上调联储加息押注，BTC/黄金/白银同步下跌，10Y +5.9bps/30Y +4.1bps。CPI 峰值分歧：Cramer 称\"人工通胀\"，MarketWatch 问\"这是峰值吗\"——市场尚无共识。现在关键：FOMC（6/17-18，Warsh 首秀）——若鸽派确认暂停加息 → 30Y 企稳、风险资产修复；若鹰派加息信号 → 30Y 升破 5.2%，系统性抛售风险上升。"
+    },
+    {
+      "label": "VIX +44.29% 至 22.22——连续大幅上行，极端警戒区（25）在即",
+      "detail": "VIX 从上日 21.69 续升至 22.22（+44.29% 单日），连续多日大幅上行。Dow 跌 900+ 点（CNBC 确认），芯片板块领跌，S&P 500 7,266.99（-0.77%）。历史规律：VIX 快速接近 25-30 通常为短期抛售高峰区域，但突破 25 后市场往往有加速下行风险。NAAIM 86.82（Jun 3 数据，去杠杆仍在进行）。观察信号：VIX 升破 25 = 极端恐慌区，可能触发强制平仓；VIX 回落至 18 以下 = 短期修复确认；NAAIM 降至 80 以下 + VIX 回落 = 市场底部区域。"
+    },
+    {
+      "label": "Crypto F&G 12（极度恐惧）& 7D资金流转正——底部确认条件满足 1/3",
+      "detail": "F&G 从 9 微升至 12（仍处极度恐惧），BTC 约 62K 附近；资金信号从 +8 急升至 +55强势流入，7D 净流入 +15.12亿（转正，此前为 -4.93亿）——底部确认三项条件现满足 1/3。条件更新：① F&G 连续2日升破35（未满足）② 7D资金流转正（已满足 ✓）③ 地缘/通胀降温（未满足）。CryptoQuant 预测底部 $53,600（The Block），SpaceX IPO 潜在抛压，宏观压制未解除。等待 F&G 连续升破35 + 地缘降温方可增持。"
+    },
+    {
+      "label": "美债 30Y 续守 5% 上方（5.019%）& 加拿大收益率逆向下行",
+      "detail": "30Y 5.019%（+0.041%），10Y 4.536%（+0.059%）——CPI 确认通胀复燃后长端加速上行。加拿大 GOC -3 bps/CMB -3 bps，与美债方向背离，BoC vs Fed 路径分歧扩大至新高。30Y 持守 5%+ 历史经验：S&P 500 P/E 面临 3-5% 重新定价，估值系统性承压。关键阈值：30Y 升破 5.2% = 系统性抛售风险显著上升；跌回 4.9% = 短期估值压制解除，可重新评估权益配置。"
+    }
+  ]
+}

@@ -81,80 +81,80 @@
     "date": "Jun 10"
   },
   "btcDom": {
-    "value": "56.2%",
+    "value": "56.3%",
     "change": "—",
     "dir": "neutral",
-    "date": "Jun 10"
+    "date": "Jun 11"
   },
   "ethBtc": {
-    "value": "0.02639",
-    "change": "-0.38%",
+    "value": "0.02624",
+    "change": "-0.79%",
     "dir": "down",
-    "date": "Jun 10"
+    "date": "Jun 11"
   },
   "sofr": {
-    "date": "06/09",
+    "date": "06/10",
     "cells": [
       {
         "label": "RATE (%)",
-        "value": "3.6%"
-      },
-      {
-        "label": "1st %ile",
-        "value": "3.56%"
-      },
-      {
-        "label": "25th %ile",
         "value": "3.59%"
       },
       {
+        "label": "1st %ile",
+        "value": "3.55%"
+      },
+      {
+        "label": "25th %ile",
+        "value": "3.57%"
+      },
+      {
         "label": "75th %ile",
-        "value": "3.65%"
+        "value": "3.64%"
       },
       {
         "label": "99th %ile",
-        "value": "3.69%"
+        "value": "3.67%"
       },
       {
         "label": "Vol ($B)",
-        "value": "3,063"
+        "value": "3,023"
       }
     ]
   },
   "vix": {
-    "value": "22.22",
-    "change": "+6.82 (+44.29%)",
+    "value": "21.53",
+    "change": "+0.02 (+0.09%)",
     "dir": "up",
-    "date": "Jun 10"
+    "date": "Jun 11"
   },
   "us10y": {
-    "value": "4.542%",
-    "change": "+0.065%",
-    "dir": "up",
-    "date": "Jun 10"
+    "value": "4.530%",
+    "change": "-0.006%",
+    "dir": "down",
+    "date": "Jun 11"
   },
   "us30y": {
-    "value": "5.025%",
-    "change": "+0.047%",
+    "value": "5.007%",
+    "change": "+0.008%",
     "dir": "up",
-    "date": "Jun 10"
+    "date": "Jun 11"
   },
   "usdCad": {
-    "value": "1.3935",
+    "value": "1.4004",
     "change": "prev 1.3906",
     "dir": "up",
-    "date": "Jun 10"
+    "date": "Jun 11"
   },
   "usdCny": {
-    "value": "6.7741",
+    "value": "6.7751",
     "change": "prev 6.7735",
     "dir": "up",
-    "date": "Jun 10"
+    "date": "Jun 11"
   },
   "cadCny": {
-    "value": "4.8599",
+    "value": "4.8376",
     "change": "prev 4.8703",
     "dir": "down",
-    "date": "Jun 10"
+    "date": "Jun 11"
   }
 }

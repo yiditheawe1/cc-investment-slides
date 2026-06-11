@@ -17,8 +17,23 @@ const DATE = MKT.date;
 const DATE_DISPLAY = new Date(DATE + 'T12:00:00Z')
   .toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
 
-// ── Analysis data (trend/cause/sources/recs/watches) — edit analysis-data.js each run
-const ANALYSIS = require('./analysis-data.js');
+// ── Analysis data (trend/cause/sources/recs/watches) — written each run by Sub-agent B
+const ANALYSIS = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'analysis-data.json'), 'utf8'));
+
+// ── Schema validation — fail loud with a single diagnosable line if Sub-agent B wrote bad data
+(() => {
+  const errs = [];
+  for (const cat of ['crypto', 'stock', 'rates', 'forex']) {
+    const c = ANALYSIS[cat];
+    if (!c) { errs.push(`${cat} missing`); continue; }
+    for (const f of ['trend', 'cause', 'sources']) if (c[f] == null) errs.push(`${cat}.${f} missing`);
+    if (c.sources && !Array.isArray(c.sources)) errs.push(`${cat}.sources not array`);
+  }
+  if (!ANALYSIS.sofr || ANALYSIS.sofr.trend == null) errs.push('sofr.trend missing');
+  if (!Array.isArray(ANALYSIS.recs)) errs.push('recs not array');
+  if (!Array.isArray(ANALYSIS.watches)) errs.push('watches not array');
+  if (errs.length) throw new Error('analysis-data.json schema invalid: ' + errs.join('; '));
+})();
 
 // ════════════════════════════════════════════════════════════
 //  SLIDE HELPERS
