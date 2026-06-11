@@ -31,11 +31,15 @@ ToolSearch({ query: "select:mcp__playwright__browser_navigate", max_results: 1 }
 
 **If tools are found** → Playwright is running. Proceed to Step 1.
 
-**If tools are NOT found** → Start the server via Bash:
-```bash
-npx @playwright/mcp@latest &
-```
-Wait 3 seconds, then retry ToolSearch once. If tools are still not found after retry, proceed in **WebFetch-only mode**: skip Playwright-dependent indicators (CNN F&G · MM Bull/Bear · AAII · Canada rates · BTC Fund Flow) and reuse their existing values from `LIVE_MANUAL` in the script — do not ask the user to paste DOM.
+**If tools are NOT found** → **STOP. Do not proceed.**
+
+Report to the user:
+
+> Playwright MCP is not running. 6 indicators (CNN F&G · MM Bull/Bear · AAII · Canada 5Y GOC/CMB · BTC Fund Flow) require a live browser and cannot be fetched without it. Running without Playwright would either produce stale data (if old LIVE_MANUAL values exist) or N/A cards — neither is acceptable for a live market dashboard.
+>
+> **To fix:** run `! npx @playwright/mcp@latest --version` in the prompt to verify npx resolves correctly, then restart the session. If the version resolves but MCP still doesn't appear, check `.claude/settings.local.json` → `mcpServers.playwright` entry.
+
+Do **not** attempt a WebFetch-only fallback. Do **not** reuse any existing LIVE_MANUAL values from the script.
 
 > **Root cause note**: The `.playwright-mcp/` directory in the project root is the Playwright MCP server's browser profile. Do NOT delete or modify its contents — doing so crashes the MCP server.
 
@@ -77,10 +81,12 @@ Use the WebFetch tool on each URL found in `indicators.md`. For each indicator e
 
 Fetch all URLs in parallel using WebFetch. If a URL returns 403 or no parseable value:
 1. Try its fallback URL (if any in `indicators.md`)
-2. If still blocked, **use the `playwright` MCP server** — see `cold_start.md` Section 9 for the exact `browser_navigate` + `browser_snapshot` sequence per source
+2. If still blocked, **use the `playwright` MCP server** — see `cold_start.md` Section 9 for the exact `browser_navigate` + `browser_evaluate` sequence per source
 3. Only mark `N/A` if Playwright also fails (CAPTCHA / login wall)
 
 **Never stop mid-run to ask the user for DOM paste — generate the PPT first, then offer to fill gaps.**
+
+> **⚡ Token/time discipline (Playwright):** the 5 Playwright sources share ONE browser tab and run sequentially. Per source use exactly **2 calls**: `browser_navigate` → `browser_evaluate` (the evaluate polls internally; do **not** add a separate `browser_wait_for` call — that is a wasted round-trip). **Never** use `browser_snapshot` here — it dumps the full accessibility tree (thousands of lines) into context. See `cold_start.md` Section 9 for the folded patterns.
 
 #### Parsing rules by indicator type (apply DOM hints from indicators.md)
 
@@ -101,13 +107,13 @@ Render as a standard card: value = 当前, change line = `"prev <前值> • <la
 
 **SOFR (6 values required)** — Auto-fetched via NY Fed JSON API (`markets.newyorkfed.org/api/rates/secured/sofr/last/1.json`) inside the main script. No Playwright needed. `refRates[0]` contains: `effectiveDate` / `percentRate` / `percentPercentile1` / `percentPercentile25` / `percentPercentile75` / `percentPercentile99` / `volumeInBillions`.
 
-**Canada 5Y CMB** — JS-rendered, WebFetch gets no data. Use Playwright MCP: navigate → wait 4s → snapshot. Look for `div.widgetTableCell.field3.col3 a` value (e.g. `3.34%`).
+**Canada 5Y CMB** — JS-rendered, WebFetch gets no data. Use Playwright MCP: navigate → one `browser_evaluate` with internal poll (cold_start Section 9 returns GOC + CMB in a single evaluate). Look for `div.widgetTableCell.field3.col3 a` value (e.g. `3.34%`).
 
 **MM Bull/Bear (4 values)** — WebFetch returns 403. Use Playwright MCP with macromicro.me URL. If Playwright also fails, use the S&P 500 Yahoo Finance fallback for sp500Current/sp500Prev only; set mm values to N/A.
 
 **AAII (4 values)** — WebFetch returns 403. Use Playwright MCP with sc.macromicro.me URL. li[0] = 看多, li[1] = 看空. If Playwright also fails, mark N/A.
 
-**加密货币资金流 — BTC Fund Flow (6 values)** — WebFetch gets no data. Use Playwright MCP: navigate → wait 4s → snapshot. Save snapshot to file (output is large). Grep for `BTC BTC` row. Column order: 货币 | 5m | 15m | 1h | 2h | 4h | 6h | 8h | 1D | 7D | 30D | 市值($) | 资金信号合约?. Extract: 15m (col 3), 4h (col 6), 7D (col 10), 30D (col 11), 市值($) (col 12), 资金信号合约? (col 13). Dir: positive value = `'up'`, negative = `'down'`, 市值 = `'neutral'`.
+**加密货币资金流 — BTC Fund Flow (6 values)** — WebFetch gets no data. Use Playwright MCP: navigate → one `browser_evaluate` with internal poll that returns ONLY the BTC row cells (cold_start Section 9). **Do NOT snapshot to file** — the evaluate returns ~12 cell strings directly. Column order: 货币 | 5m | 15m | 1h | 2h | 4h | 6h | 8h | 1D | 7D | 30D | 市值($) | 资金信号合约?. Extract: 15m (col 2), 4h (col 5), 7D (col 9), 30D (col 10), 市值($) (col 11), 资金信号合约? (col 12). Dir: positive value = `'up'`, negative = `'down'`, 市值 = `'neutral'`.
 
 ### Step 4 — Organize data
 
@@ -152,80 +158,13 @@ The JSON contains **all 16 indicators** (6 manual + 10 API) using the exact key 
 
 ### Step 5 — Generate PPT using pptxgenjs
 
-Use the pptx skill's pptxgenjs.md reference to write and execute a Node.js script.
-Output file: `investment-index-slides.pptx` in the current working directory.
-
-#### Slide structure (5 slides total)
-
-**Slide 0 — Cover**
-- Title: "Market Index Dashboard"
-- Subtitle: current date (YYYY-MM-DD) + time (HH:MM UTC/local)
-- Dark background (#0F172A), white text
-- Accent bar in brand teal (#0D9488)
-
-**Slide 1 — CRYPTO**
-**Slide 2 — STOCK**
-**Slide 3 — 利率 (Rates)**
-**Slide 4 — Forex**
-
-#### Per-category slide layout
-
-Each slide must follow this layout:
-
-```
-┌─────────────────────────────────────────┐
-│  [Category accent bar left edge]        │
-│  CATEGORY TITLE          DATE / TIME    │
-├─────────────────────────────────────────┤
-│                                         │
-│  ┌──────────┐  ┌──────────┐  ┌───────┐ │
-│  │ Indicator│  │ Indicator│  │ ...   │ │
-│  │  Value   │  │  Value   │  │       │ │
-│  │  +change │  │  label   │  │       │ │
-│  └──────────┘  └──────────┘  └───────┘ │
-│  (repeat in grid rows as needed)        │
-└─────────────────────────────────────────┘
-```
-
-- **Layout**: LAYOUT_16x9 (10" × 5.625")
-- **Background**: dark navy (#0F172A)
-- **Slide title**: white, bold, 28pt, left-aligned, 0.4" from top
-- **Date/time**: gray (#94A3B8), 12pt, top-right corner
-- **Indicator cards**: white rounded rectangles with subtle shadow
-  - Card background: #1E293B
-  - Indicator name: slate (#94A3B8), 11pt
-  - Value: white, bold, 24pt
-  - Change/trend: green (#22C55E) for positive, red (#EF4444) for negative, gray for neutral
-  - Sentiment label: teal (#0D9488), italic, 11pt
-
-#### Category accent colors
-
-| Category | Accent color |
-|----------|-------------|
-| CRYPTO   | #F59E0B (amber) |
-| STOCK    | #3B82F6 (blue) |
-| 利率      | #8B5CF6 (purple) |
-| Forex    | #10B981 (emerald) |
-
-Left edge accent bar: 0.08" wide × full slide height, accent color.
-
-#### Card grid sizing
-
-Distribute cards evenly. Examples:
-- 4 indicators → 2×2 grid
-- 6 indicators → 3×2 grid
-- 3 indicators → 3×1 row
-
-Card dimensions: adjust to fill the slide body (below title, above bottom margin 0.2").
-Horizontal padding between cards: 0.15".
-Vertical padding between card rows: 0.15".
-Outer horizontal margin: 0.4" (after accent bar).
+> Full slide structure, per-category layout, color palette, card grid sizing → `SKILL_lessons.md` (only needed when writing the script from scratch).
 
 ### Step 6 — Update and run the script
 
-1. **Read the existing `generate_investment_index_slides.js`** first. It persists between runs — do NOT rewrite it from scratch.
-   - If it exists: edit only the data values (indicator numbers, dates). The functions and layout are stable.
-   - If it does not exist: write it fresh using the template in `cold_start.md` Section 5.
+1. **Read ONLY the `LIVE_MANUAL` block, not the full 500-line script.** The functions/layout/API code are stable and never edited — reading them wastes ~5k tokens every run. Use `Read('generate_investment_index_slides.js', { offset: 43, limit: 55 })` to pull just the `LIVE_MANUAL` object (the only thing that changes run-to-run). Then Edit only the changed indicator values/dates inside it.
+   - If the file does not exist at all: only then Read/write it fresh using the template in `cold_start.md` Section 5.
+   - If the offset/limit window misses `LIVE_MANUAL` (script was refactored): Grep for `const LIVE_MANUAL` to find the new line range, then Read that range — still avoid reading the whole file.
 2. Run it with: `node generate_investment_index_slides.js`
    - The script must `require` pptxgenjs using `path.resolve`:
      `const pptxgen = require(require('path').resolve(__dirname, '.claude/skills/pptx/node_modules/pptxgenjs'));`
@@ -233,115 +172,7 @@ Outer horizontal margin: 0.4" (after accent bar).
 4. Verify the file was created.
 5. Report the output path and a summary table of all fetched indicator values.
 
-#### Fund Flow card — 3×2 six-value layout
-
-The 加密货币资金流 tile uses a 3-column × 2-row sub-grid. Implement as `addFundFlowCard(slide, pres, x, y, w, h, d)` where `d` is:
-```js
-{
-  date: "May 25",
-  items: [
-    { label: '15m',      value: '-327.33万',   dir: 'down'    },  // col0, row0
-    { label: '4h',       value: '-1.02亿',     dir: 'down'    },  // col1, row0
-    { label: '7D',       value: '-2.96亿',     dir: 'down'    },  // col2, row0
-    { label: '30D',      value: '+49.96亿',    dir: 'up'      },  // col0, row1
-    { label: '市值($)',  value: '15,445.73亿', dir: 'neutral' },  // col1, row1
-    { label: '资金信号', value: '+16 均衡',    dir: 'up'      },  // col2, row1
-  ],
-}
-```
-
-```
-┌──────────────────────────────────┐
-│ 加密货币资金流            May 25 │  slate 10pt + muted 8pt
-├──────────┬────────────┬──────────┤  divider #2D3F55
-│   15m    │    4h      │    7D    │  label gray 8pt center
-│ -327万   │ -1.02亿   │ -2.96亿  │  value 13pt bold, red (down)
-├──────────┼────────────┼──────────┤  divider #2D3F55
-│   30D    │  市值($)  │ 资金信号  │  label gray 8pt center
-│ +49.96亿 │ 15,445亿  │ +16 均衡  │  value 13pt bold: green/slate/green
-└──────────┴────────────┴──────────┘
-```
-
-All 6 values use identical font (13pt bold). Color by `dir`: `'up'` → green (#22C55E), `'down'` → red (#EF4444), `'neutral'` → slate (#94A3B8). Vertical dividers between all 3 columns, horizontal divider between 2 rows.
-
-#### SOFR card — 3×2 hex-value layout
-
-The SOFR tile uses a 3-column × 2-row sub-grid. Implement as `addSofrCard(slide, x, y, w, h, d)` where `d` is:
-```js
-{
-  date: "2026-05-21",
-  cells: [
-    { label: "RATE (%)",   value: "3.51%" },  // col0, row0
-    { label: "1st %ile",   value: "3.48%" },  // col1, row0
-    { label: "25th %ile",  value: "3.51%" },  // col2, row0
-    { label: "75th %ile",  value: "3.55%" },  // col0, row1
-    { label: "99th %ile",  value: "3.62%" },  // col1, row1
-    { label: "Vol ($B)",   value: "3,077"  },  // col2, row1
-  ],
-}
-```
-
-```
-┌──────────────────────────────────┐
-│ SOFR                  as of DATE │  gray 10pt + muted 8pt
-├──────────┬────────────┬──────────┤  divider #2D3F55
-│ RATE (%) │ 1st %ile  │ 25th %ile│  label gray 8pt
-│ 3.51%    │ 3.48%     │ 3.51%    │  value teal 15pt bold
-├──────────┼────────────┼──────────┤  divider #2D3F55
-│ 75th %ile│ 99th %ile │ Vol ($B) │
-│ 3.55%    │ 3.62%     │ 3,077    │  Vol value white 15pt bold
-└──────────┴────────────┴──────────┘
-```
-
-Vertical dividers between all 3 columns, horizontal divider between 2 rows.
-
-#### Generic quad-value card — used by NAAIM, MM Bull/Bear, AAII
-
-Three cards share the same 2×2 sub-grid layout. Implement as `addQuadCard(slide, x, y, w, h, cfg)` where `cfg` is:
-```js
-{
-  title: "card title",           // slate 10pt
-  topLeft:   { label, value },   // row-1 left  — value white 20pt bold
-  topRight:  { label, value },   // row-1 right — value white 20pt bold
-  botLeft:   { label, value },   // row-2 left  — value teal  20pt bold
-  botRight:  { label, value },   // row-2 right — value teal  20pt bold
-  footnote:  "as of YYYY-MM-DD", // bottom-right 8pt muted
-}
-```
-
-```
-┌──────────────────────────────────┐
-│ <title>                          │  slate 10pt
-├─────────────────┬────────────────┤  divider #2D3F55
-│ <topLeft.label> │ <topRight.label>│  slate 9pt
-│ <topLeft.value> │ <topRight.value>│  white 20pt bold
-├─────────────────┼────────────────┤  divider #2D3F55
-│ <botLeft.label> │ <botRight.label>│  slate 9pt
-│ <botLeft.value> │ <botRight.value>│  teal  20pt bold
-│               <footnote>         │  muted 8pt right-align
-└──────────────────────────────────┘
-```
-
-#### NAAIM card — special 4-value layout
-
-The NAAIM card in the STOCK slide must display a 2×2 sub-grid instead of a single value:
-
-```
-┌──────────────────────────────────┐
-│ NAAIM 经理人持仓                  │  ← card title (slate, 11pt)
-├─────────────────┬────────────────┤
-│ 当前             │ 前值            │  ← sub-labels (slate, 9pt)
-│ 82.02           │ 77.34          │  ← values (white, 18pt bold)
-├─────────────────┼────────────────┤
-│ 4W MA (当前)    │ 4W MA (前值)   │  ← sub-labels (slate, 9pt)
-│ 87.46           │ 90.49          │  ← values (teal, 18pt bold)
-└─────────────────┴────────────────┘
-```
-
-Implement this as a dedicated `addNaaimCard(slide, x, y, w, h, data)` function. `data` has shape:
-```js
-{ current: "82.02", prev: "77.34", ma4w: "87.46", ma4wPrev: "90.49", date: "2026-05-20" }
-```
+> Card layout specs (Fund Flow · SOFR · Quad · NAAIM) → `SKILL_lessons.md` (only needed when implementing card functions from scratch).
 
 ### Step 7 — Invoke investment-index-analysis skill
 

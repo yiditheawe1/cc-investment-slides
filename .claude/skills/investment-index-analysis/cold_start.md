@@ -26,24 +26,58 @@
 
 ### ✅ Playwright MCP 可抓取（WebFetch 返回 403/451）
 
+经 2026-05-31 实测确认，以下来源用 Playwright MCP 均可获取实质内容：
+
 | 消息源 | URL | 提取方式 |
 |--------|-----|----------|
 | CNBC Markets | https://www.cnbc.com/markets/ | `browser_evaluate` — 见 Section 2 |
+| CNN Business/Investing | https://www.cnn.com/business/investing | `browser_evaluate` — 见 Section 2 |
+| The Block | https://www.theblock.co/ | `browser_evaluate` — 见 Section 2 |
+| Bloomberg Markets | https://www.bloomberg.com/markets | `browser_evaluate`（标题可抓；正文付费墙，仅用于标题补充） |
+| Yahoo Finance News | https://finance.yahoo.com/news/ | `browser_evaluate` — 见 Section 2 |
+| NY Fed SOFR 页面 | https://www.newyorkfed.org/markets/reference-rates/sofr | `browser_evaluate` 可读完整数据表（已有 JSON API，一般不需要） |
+| Bank of Canada /rates/ | https://www.bankofcanada.ca/rates/ | ⚠️ **实测（2026-05-31）：/rates/ 和 /interest-rates/ 均为导航页，browser_evaluate 返回仅为链接列表，无实际数值**。利率数据直接读 market-index.json；驱动分析从 CNBC/Investing.com 获取 |
+| MarketWatch | https://www.marketwatch.com/ | `browser_evaluate` — 见 Section 2 |
 
-### ❌ 完全阻断（WebFetch + Playwright 均无法获取新闻正文）
+### ❌ 实际阻断
 
 | 消息源 | 失败原因 | 替代方案 |
 |--------|----------|----------|
-| The Block | 403 Forbidden | 改用 CoinDesk |
-| Bloomberg（所有子页面） | 登录墙，Playwright 只返回导航链接 | 改用 Investing.com / CoinDesk |
-| Yahoo Finance /news/ | HTTP 503 | — |
-| NY Fed SOFR 页面 | 403（HTML 页面） | 改用 NY Fed JSON API（已在 investment-index-slides 脚本中） |
-| US Treasury 收益率页面 | 60 秒超时 | 改用 market-index.json 已有数据 |
-| Bank of Canada /rates/ | 只返回导航，无实际利率数据 | 只用于政策背景描述；具体利率读 market-index.json |
+| Reuters Markets | Playwright 仅返回 3 条无实质内容的条目，有效阻断 | 改用 MarketWatch / Investing.com |
+| US Treasury 收益率页面（原 URL） | 404 页面已失效 | 利率数据直接读 market-index.json（来自 Yahoo Finance API）|
 
 ---
 
 ## 2. 可复用抓取 Pattern
+
+所有 Playwright 来源通用 evaluate 模板（去重 + 过滤短字符串）：
+```js
+() => {
+  const els = [...document.querySelectorAll('h2, h3, [class*="headline"]')];
+  return [...new Set(els.map(e => e.innerText?.trim()).filter(t => t && t.length > 20))].slice(0, 15);
+}
+```
+
+### MacroMicro (CNN F&G · MM Bull/Bear · AAII) — Playwright browser_evaluate (verified 2026-06-09)
+
+Same single pattern works for all three pages:
+```
+browser_navigate({ url: "<macromicro chart URL>" })
+browser_wait_for({ time: 2 })
+browser_evaluate({
+  function: `() => {
+    const rows = document.querySelectorAll('div.sidebar-sec.chart-stat-lastrows li');
+    return [...rows].map((li, i) => ({
+      index:   i,
+      name:    li.querySelector('.stat-name a')?.innerText?.trim(),
+      date:    li.querySelector('.date-label')?.innerText?.trim(),
+      current: li.querySelector('.stat-val .val')?.innerText?.trim(),
+      prev:    li.querySelector('.prev-val .val')?.innerText?.trim(),
+    }));
+  }`
+})
+```
+Returns clean JSON — do NOT use `browser_snapshot` on macromicro pages.
 
 ### CNBC Markets — Playwright browser_evaluate
 
@@ -52,104 +86,106 @@ browser_navigate({ url: "https://www.cnbc.com/markets/" })
 browser_wait_for({ time: 3 })
 browser_evaluate({
   function: `() => {
-    const articles = [...document.querySelectorAll('a[href*="/YEAR/"], a[href*="article"]')];
+    const articles = [...document.querySelectorAll('a[href*="/2026/"], a[href*="article"]')];
     const headlines = [];
     articles.forEach(a => {
       const text = a.textContent.trim();
-      if (text.length > 30 && text.length < 200 && !headlines.includes(text)) {
-        headlines.push(text);
-      }
+      if (text.length > 30 && text.length < 200 && !headlines.includes(text)) headlines.push(text);
     });
     return headlines.slice(0, 15);
   }`
 })
 ```
+**注意**：不要用 `browser_snapshot`——CNBC accessibility tree 过大，用 evaluate 更快。
 
-把 `YEAR` 替换为当前年份（如 `2026`）。返回标题字符串数组，无需 snapshot。
-**注意**：不要用 `browser_snapshot`——CNBC 的 accessibility tree 过大，用 evaluate 更快。
+### CNN Business/Investing — Playwright browser_evaluate
+
+```
+browser_navigate({ url: "https://www.cnn.com/business/investing" })
+browser_wait_for({ time: 3 })
+browser_evaluate({
+  function: `() => {
+    const els = [...document.querySelectorAll('a[data-link-type="article"], [class*="container__headline"], h2, h3')];
+    return [...new Set(els.map(e => e.innerText?.trim()).filter(t => t && t.length > 15))].slice(0, 15);
+  }`
+})
+```
+注：旧 `www.cnn.com/markets/fear-and-greed` 仍 451；只用 `/business/investing` 子页。
+
+### The Block — Playwright browser_evaluate
+
+```
+browser_navigate({ url: "https://www.theblock.co/" })
+browser_wait_for({ time: 3 })
+browser_evaluate({
+  function: `() => {
+    const els = [...document.querySelectorAll('h2, h3, a[href*="/post/"]')];
+    return [...new Set(els.map(e => e.innerText?.trim()).filter(t => t && t.length > 15))].slice(0, 15);
+  }`
+})
+```
+
+### Bloomberg Markets — Playwright browser_evaluate（标题层）
+
+```
+browser_navigate({ url: "https://www.bloomberg.com/markets" })
+browser_wait_for({ time: 3 })
+browser_evaluate({
+  function: `() => {
+    const els = [...document.querySelectorAll('h1, h2, h3, [class*="headline"], [class*="story"]')];
+    return [...new Set(els.map(e => e.innerText?.trim()).filter(t => t && t.length > 15))].slice(0, 15);
+  }`
+})
+```
+**注意**：正文仍在付费墙后，只能用于标题级别补充，不要引用具体论点。
+
+### Yahoo Finance News — Playwright browser_evaluate
+
+```
+browser_navigate({ url: "https://finance.yahoo.com/news/" })
+browser_wait_for({ time: 3 })
+browser_evaluate({
+  function: `() => {
+    const els = [...document.querySelectorAll('h3, [class*="headline"], a[href*="/news/"]')];
+    return [...new Set(els.map(e => e.innerText?.trim()).filter(t => t && t.length > 20))].slice(0, 15);
+  }`
+})
+```
+
+### MarketWatch — Playwright browser_evaluate
+
+```
+browser_navigate({ url: "https://www.marketwatch.com/" })
+browser_wait_for({ time: 3 })
+browser_evaluate({
+  function: `() => {
+    const els = [...document.querySelectorAll('h3, h2, [class*="headline"]')];
+    return [...new Set(els.map(e => e.innerText?.trim()).filter(t => t && t.length > 20))].slice(0, 15);
+  }`
+})
+```
 
 ### CoinDesk — WebFetch prompt
 
 ```
-WebFetch(url="https://www.coindesk.com/", prompt="Extract top 5-8 news headlines from today or yesterday (YYYY-MM-DD or YYYY-MM-DD-1). For each: headline, date, 1-sentence summary. Focus on Bitcoin, BTC dominance, ETH, fund flows, market sentiment.")
+WebFetch(url="https://www.coindesk.com/", prompt="Extract top 5 news headlines from today or yesterday only. For each: headline | date | 1-sentence summary (max 20 words). Focus on BTC, ETH, fund flows, sentiment. Max 80 words total.")
 ```
 
 ### Alternative.me — WebFetch prompt
 
 ```
-WebFetch(url="https://alternative.me/crypto/fear-and-greed-index/", prompt="Current Fear & Greed value, classification, previous day value, and any explanation of current sentiment.")
+WebFetch(url="https://alternative.me/crypto/fear-and-greed-index/", prompt="Return only: current value, classification label, previous day value. Max 30 words.")
+```
+
+### Investing.com sources — WebFetch prompt template
+
+All Investing.com URLs use this prompt pattern (substitute category as needed):
+
+```
+WebFetch(url="https://www.investing.com/...", prompt="Extract top 5 articles from today or yesterday only. For each: headline | date | 1-sentence summary (max 20 words each). Skip articles older than 2 days. Max 80 words total.")
 ```
 
 ---
 
-## 3. 数据来源分工（推荐组合）
+> Sections 3–6（来源分工·经验教训·工作流·叙事模板）已移至 `cold_start_lessons.md`，仅调试时读取。
 
-| 类别 | 主力来源 | 补充来源 | 说明 |
-|------|----------|----------|------|
-| CRYPTO 新闻 | CoinDesk (WebFetch) | Alternative.me + CoinMarketCap (WebFetch) | 3 源全部 WebFetch，不需 Playwright |
-| STOCK 新闻 | CNBC (Playwright evaluate) | NAAIM (WebFetch) | CNBC 是唯一可靠的股票新闻源 |
-| SOFR / 利率 | market-index.json 数据 + CNBC 政策报道 | Bank of Canada 背景 | 利率数据直接读 JSON；新闻背景从 CNBC |
-| FOREX | CNBC 外汇/能源标题 | market-index.json 数据 | Reuters/MarketWatch 均阻断；CNBC 标题中有汇率驱动因素 |
-
-**核心原则**：利率和外汇类新闻不需要专门的财经数据页面——CNBC 的综合市场新闻已覆盖驱动因素（加息预期、油价、地缘事件）。
-
----
-
-## 4. 经验教训
-
-| 教训 | 原因 | 解决方法 |
-|------|------|----------|
-| Bloomberg 在 Playwright 下也是登录墙 | 即使用真实浏览器，未登录用户只能看到导航链接 | 不要尝试 Bloomberg；用 CNBC 代替 |
-| Yahoo Finance /news/ 子页面返回 503 | Yahoo Finance 新闻聚合页面对 bot 有限制 | 个别 quote 页面（如 `^VIX`）可以抓到市场数据，但新闻标题不可靠 |
-| Reuters 和 MarketWatch 完全阻断 | Claude Code 环境层面屏蔽，非 403 | 标注"Playwright fallback"并用 CNBC 代替，在 PPT 消息源中说明 |
-| Bank of Canada `/rates/` 只有导航 | 这是一个索引页，不展示实际数据 | 只用该域名的政策语境（"April 2026 报告"），实际利率数据来自 market-index.json |
-| AAII 返回空 body | 与 investment-index-slides 一致——该网站对 WebFetch 完全不响应 | 实际数据读 market-index.json；在分析文本中引用 AAII 作为来源名称即可 |
-| US Treasury 页面超时 | 页面较重，60 秒内无响应 | 不尝试此 URL；10Y/30Y 数据直接读 market-index.json |
-| CNBC 用 WebFetch 返回 403 | 需要真实浏览器 UA | 改用 Playwright + evaluate（不要用 snapshot） |
-| 不要为消息源标注"blocked"让 PPT 显得不专业 | — | 在 sources 字段写法：`reuters.com/markets/currencies`，用括号注明 fallback 来源（仅限内部文档，PPT 显示简洁 URL 即可） |
-| market-index.json 中 ca5yCmb 曾存错误值 | 首次抓 canadaici.com 用 `[0]` 取到 GOC（3.19%）而非 CMB（3.32%）；两者同页同 CSS 类 | 利率分析时区分 GOC（政府债）和 CMB（联邦按揭债）；market-index.json 现已同时含 `ca5yGoc` 和 `ca5yCmb` 两个字段 |
-
----
-
-## 5. 推荐工作流（下次 session）
-
-```
-Step 1 — 并行 WebFetch（最多 9 个，全部无需 Playwright）:
-  CRYPTO:  a. CoinDesk
-           b. Alternative.me (F&G context)
-           c. CoinMarketCap /headlines/
-           d. Investing.com /news/cryptocurrency-news
-           e. Investing.com /analysis/cryptocurrency   （可选，深度分析）
-  STOCK:   f. Investing.com /news/stock-market-news
-           g. Investing.com /analysis/stock-markets    （可选）
-  利率:    h. Investing.com /analysis/bonds
-  FOREX:   i. Investing.com /news/forex-news
-  跨板块:  j. Investing.com /analysis/market-overview
-           k. Investing.com /news/headlines            （可选，突发补充）
-
-Step 2 — Playwright CNBC（若 MCP 可用，可补充 stock + rates 深度覆盖）:
-  browser_navigate → wait 3s → browser_evaluate (headline extractor)
-  ⚠️ 非必须：Investing.com WebFetch 已可覆盖同类内容
-
-Step 3 — WebFetch NAAIM（如 market-index.json 数据需要最新）:
-  可选；若 market-index.json 已有当日数据则跳过
-
-Step 4 — 综合 market-index.json 数据，写 ANALYSIS 对象，运行脚本:
-  node generate_investment_index_analysis.js
-```
-
-最低配置（Playwright 不可用时）：**9 次 WebFetch** 即可覆盖全部 5 个分析板块。
-
----
-
-## 6. 关键分析叙事模板
-
-以下为可复用的分析框架（根据当日数据填入具体数字）：
-
-**CRYPTO**：`{地缘/宏观事件}` 引发 `{爆仓金额}` 多空清算，BTC 跌至 `{价位}`，F&G 降至 `{值}`（极度恐惧）。资金流向数据显示 `{净流入/净流出}`，暗示 `{机构吸筹/散户恐慌出逃}`。
-
-**STOCK**：标普 500 `{上涨/下跌}` 受 `{事件}` 驱动，VIX `{变化方向}` 至 `{值}`。NAAIM 经理人仓位 `{值}`（`{高位/低位}`区间），AAII 散户 `{看多%}` vs `{看空%}`——两者`{一致/背离}`。
-
-**利率**：美债收益率 `{下行/上行}` 受 `{避险需求/降息预期/通胀}` 驱动；SOFR 维稳于 `{值}`，联储信号`{鸽/鹰}`；加拿大 5Y GOC `{+/-X bps}`、CMB `{+/-X bps}`，利差 `{稳定/扩大/收窄}`，反映`{加央行政策路径}`。
-
-**FOREX**：USD/CAD `{升/降}`，`{加元走软/走强}` 与`{油价/BoC政策}`相关；USD/CNY `{升/降}`，`{人民币走强/走软}`反映`{政策稳汇/贸易预期}`；两者形成`{一致/背离}`格局。

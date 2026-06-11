@@ -190,200 +190,82 @@ The page does **not** publish a separate MA column — always compute it from th
 
 ---
 
-## 5. Slide Structure & Card Layout
-
-```
-Slide 0: Cover
-Slide 1: CRYPTO  — gcell(2, 2)  → 2×2 grid, 4 cards
-Slide 2: STOCK   — gcell(3, 2)  → 3×2 grid, 6 slots
-  Row 0: Fear&Greed | VIX | MM Bull/Bear
-  Row 1: SOFR      | AAII 牛熊  | NAAIM
-Slide 3: 利率     — gcell(2, 2)  → 2×2 grid, 4 cards (US10Y · US30Y · CA5YGOC · CA5YCMB)
-Slide 4: Forex    — gcell(3, 1)  → 3×1 row, 3 cards
-```
-
-### Card Data Object (standard `addCard`)
-```js
-{ nm: 'Label',   // indicator name (slate 10pt)
-  val: '58.57',  // main value (white bold; auto-sizes font for long strings)
-  lbl: 'Greed',  // sentiment label (teal italic) — optional
-  sub: 'prev 58.06 • Greed',  // change / sub line — optional
-  pos: true,     // true=green, false=red, null=muted gray
-  dt:  'May 22', // as-of date shown bottom-right — optional
-}
-```
-
-### Special Cards
-| Card | Function | Data shape |
-|------|----------|-----------|
-| Fund Flow | `addFundFlowCard(s,pr,x,y,w,h,d)` | `{ date, items:[{label,value,dir}×6] }` — 3×2 grid, 13pt bold, color by dir |
-| NAAIM | `addNaaimCard(s,pr,x,y,w,h,d)` | `{ current, prev, ma4w, ma4wPrev, date }` |
-| SOFR | `addSofrCard(s,pr,x,y,w,h,d)` | `{ date, cells:[{label,value}×6] }` — 3×2 grid |
-| MM Bull/Bear | `addQuadCard(s,pr,x,y,w,h,cfg)` | `{ title, tl, tr, bl, br, note }` |
-| AAII | `addQuadCard(s,pr,x,y,w,h,cfg)` | same as MM |
-
-### Color Palette (`C` object — no `#` prefix)
-```js
-const C = {
-  bg:'0F172A', card:'1E293B', white:'FFFFFF', slate:'94A3B8',
-  teal:'0D9488', green:'22C55E', red:'EF4444', div:'2D3F55',
-  muted:'64748B', amber:'F59E0B', blue:'3B82F6',
-  purple:'8B5CF6', emerald:'10B981',
-};
-```
-
-### Category Accent Colors
-| Slide | Accent |
-|-------|--------|
-| CRYPTO | `C.amber` — #F59E0B |
-| STOCK | `C.blue` — #3B82F6 |
-| 利率 | `C.purple` — #8B5CF6 |
-| Forex | `C.emerald` — #10B981 |
-
----
-
-## 6. Recommended Cold-Start Workflow
-
-**The script is self-contained — 10 APIs are fetched automatically at run time.**
-Only 6 Playwright/manual indicators need updating in `LIVE_MANUAL` before each run.
-
-**Step 1 — WebFetch NAAIM:**
-```
-WebFetch → https://www.naaim.org/programs/naaim-exposure-index/
-Extract ≥5 weekly rows, compute 4W MAs (see Section 4).
-```
-
-**Step 2 — Playwright MCP for the 5 JS-rendered sources:**
-The `playwright` MCP server is installed at user scope (`npx @playwright/mcp@latest`).
-Use `browser_navigate` → `browser_wait_for` → `browser_snapshot({ target: "main" })`.
-Fetch in sequence (Playwright is stateful — one browser tab at a time):
-1. CNN F&G → https://en.macromicro.me/collections/34/us-stock-relative/50108/cnn-fear-and-greed
-2. MM Bull/Bear → https://en.macromicro.me/collections/34/us-stock-relative/142681/us-mm-bull-and-bear-indicator
-3. AAII → https://sc.macromicro.me/charts/77072/AAII-niu-xiong-yu-biao-pu-500-guan-xi
-4. Canada 5Y GOC + CMB → https://www.canadaici.com/market-data/
-5. 加密货币资金流 (BTC) → https://coinank.com/zh/fund/fundSwap
-
-If Playwright also fails (CAPTCHA / login wall), mark N/A and continue — do NOT ask the user for DOM paste.
-
-**Step 3 — Edit `LIVE_MANUAL` (6 keys), then run:**
-
-After Steps 1–2, edit only these keys in `generate_investment_index_slides.js`:
-
-```
-cnnFG    → { value, change, dir, date }
-mm       → { mmCurrent, mmPrev, sp500Current, sp500Prev, date }
-aaii     → { bullCurrent, bullPrev, bearCurrent, bearPrev, date }
-naaim    → { current, prev, ma4w, ma4wPrev, date }
-ca5yGoc  → { value, change, dir, date }   ← querySelectorAll(...)[0] from canadaici.com (GOC 5Y)
-ca5yCmb  → { value, change, dir, date }   ← querySelectorAll(...)[2] from canadaici.com (CMB 5Y)
-fundFlow → { date, items: [{label, value, dir}×6] }
-           labels: '15m' | '4h' | '7D' | '30D' | '市值($)' | '资金信号'
-           dir: 'up' (positive) | 'down' (negative) | 'neutral' (市值)
-```
-
-Then run — it fetches the 10 APIs and generates the PPTX in one shot:
-```bash
-cd "e:\CC项目" && node generate_investment_index_slides.js
-```
-
-The script prints `API: X/10 fetched` then `SUCCESS: investment-index-slides_YYYY_MM_DD.pptx`.
-
-After the slides script completes, **invoke the `investment-index-analysis` Claude skill** (via `Skill` tool). That skill fetches news, updates the `ANALYSIS` block in `generate_investment_index_analysis.js`, and generates `market-change-analysis_YYYY_MM_DD.pptx` with fresh content. **Do NOT run `generate_investment_index_analysis.js` directly** — it only re-renders stale hardcoded text.
-
-> `fetch_live_data.js` is now obsolete — the API logic lives inside the main script.
-> Do NOT run `fetch_live_data.js` or use it to patch the LIVE block.
-
----
-
-## 7. CNN Fear & Greed — Sentiment Label Lookup
-
-| Value range | Label |
-|-------------|-------|
-| 0–24 | Extreme Fear |
-| 25–44 | Fear |
-| 45–54 | Neutral |
-| 55–74 | Greed |
-| 75–100 | Extreme Greed |
-
----
-
-## 8. Known Pitfalls Summary
-
-| Pitfall | What Happened | Fix |
-|---------|--------------|-----|
-| Rewrote script from scratch | `generate_investment_index_slides.js` already exists on disk; rewrote 250 lines + first run failed on require path → ~3 min wasted | Read the existing file, edit only the LIVE block |
-| CNBC blocked | cnbc.com returns 403 for VIX and treasury quotes | Use Yahoo Finance instead |
-| CNN blocked | cnn.com/markets/fear-and-greed returns 451 | Use macromicro.me chart 50108 via Playwright MCP |
-| Bank of Canada API returns wrong value | V80691335 series = conventional mortgage ~6%, not CMB ~3.34% | Only use canadaici.com via Playwright MCP |
-| macromicro.me always 403 to WebFetch | All macromicro.me and sc.macromicro.me URLs blocked for plain HTTP | Use Playwright MCP — do not ask user for DOM paste |
-| SOFR FRED also 403 | fred.stlouisfed.org also blocked | Use NY Fed via Playwright MCP |
-| aaii.com returns empty | aaii.com/sentimentsurvey serves blank body to WebFetch | Use macromicro.me chart 77072 via Playwright MCP |
-| canadaici.com page dynamic | WebFetch gets no data | Use Playwright MCP for `div.widgetTableCell.field3.col3 a` |
-| GOC confused with CMB | `querySelectorAll(...)[0]` returns GOC 5Y (3.19%), not CMB 5Y (3.32%) — same CSS class for all rows | Use index [2] for CMB 5Y; index [0] for GOC 5Y. Page order: GOC5Y[0] · GOC10Y[1] · CMB5Y[2] · CMB10Y[3] |
-| coinank.com dynamic | WebFetch gets no usable data | Use Playwright MCP: navigate → wait 4s → `browser_evaluate` (preferred, ~2× faster) or `browser_snapshot({ filename: "coinank_snapshot.md" })` + Grep for `BTC BTC` row |
-| coinank snapshot too large to inline | Full `browser_snapshot()` returns 2000+ lines — floods context and slows parsing | Always pass `filename: "coinank_snapshot.md"` to save to file, then `Grep pattern: "BTC BTC"` to extract just the row; or use `browser_evaluate` to skip the snapshot entirely |
-| pptxgenjs `#` in colors | Silently ignored, colors not applied | Strip `#` from all hex strings |
-| pptxgenjs `line.width` | Should be `line.pt` | Use `pt` for line thickness |
-| Hardcoded filename | Previous versions had hardcoded date | Always compute filename dynamically from `new Date()` UTC |
-| Old require path | `require(".claude/...")` or `require("./.claude/...")` fails on Windows with Chinese-character paths | Use `require(require('path').resolve(__dirname, '.claude/skills/pptx/node_modules/pptxgenjs'))` |
-| Stopped mid-run to ask for DOM paste | After auto-fetching, paused execution to request blocked-source DOM from user → no PPT generated | Always generate PPT immediately with N/A for blocked sources; offer Playwright fetch or DOM paste only after file is confirmed created |
-| SOFR: browser_wait_for text timeout | Used `browser_wait_for({ text: "SOFR" })` — the word "SOFR" appears in a hidden nav link before the data table renders, causing a 30s TimeoutError | Use `browser_wait_for({ time: 4 })` (fixed delay), then `browser_snapshot({ target: "table" })` |
-| MacroMicro: stale element ref crash | Used `browser_snapshot({ target: "generic[ref=e178]" })` — ref was copied from the previous page's snapshot and doesn't exist on the new page | Never reuse element refs across page navigations; always use semantic targets like `"main"` |
-| MacroMicro: depth-limited snapshot too shallow | Used `browser_snapshot({ depth: 4 })` — collapses the stats block and makes values invisible | Use `browser_snapshot({ target: "main" })` for focused but complete content |
-
----
+> Sections 5–8（幻灯片结构·冷启动工作流·CNN F&G 标签·已知陷阱）已移至 `cold_start_lessons.md`，仅调试时读取。
 
 ## 9. Playwright MCP — Fetch Patterns for Blocked Sources
 
 The `playwright` MCP server is registered at user scope and runs `npx @playwright/mcp@latest`.
 It provides a real Chromium browser, bypassing 403 blocks and JS-rendering issues.
 
-### Standard tool sequence
+### Standard tool sequence — 2 calls per source (navigate + evaluate)
 
 ```
 1. browser_navigate({ url: "https://..." })
-2. browser_wait_for({ time: 3 })             ← wait 3s — unit is SECONDS, not ms (3000 is wrong)
-3. browser_snapshot()                         ← returns accessibility tree as structured text
-4. Parse values from snapshot text
+2. browser_evaluate({ function: `async () => { /* poll internally, then return JSON */ }` })
 ```
 
-If the snapshot is empty or the key element is missing, try `browser_wait_for({ selector: "<css>" })` instead of the fixed 3s wait.
+**Do NOT add a separate `browser_wait_for` call** — the page is already loading after navigate, and the evaluate polls internally for the target element (pattern below). This cuts one round-trip (and one snapshot-laden tool response) per source. **Never** use `browser_snapshot` — it dumps the full accessibility tree.
+
+The internal-poll idiom (reused by every pattern below):
+```js
+async () => {
+  for (let i = 0; i < 20; i++) {               // up to ~4s; bump to 30 (~6s) for slow SPAs
+    if (/* target element has a non-empty value */) break;
+    await new Promise(r => setTimeout(r, 200));
+  }
+  return /* extracted JSON */;
+}
+```
+
+> **Fallback (only if evaluate returns empty):** older MCP builds may reject `async` functions. If the first evaluate comes back empty, run `browser_wait_for({ time: 3 })` once, then re-run a plain `() => {...}` (sync) version of the same evaluate.
 
 ### Per-source patterns
 
-**MacroMicro (CNN F&G · MM Bull/Bear · AAII)** — all three follow the same pattern:
+**MacroMicro (CNN F&G · MM Bull/Bear · AAII)** — all three use the same `browser_evaluate` pattern (verified 2026-06-09):
 ```
 browser_navigate({ url: "<macromicro chart URL>" })
-browser_wait_for({ time: 3 })                ← wait 3 seconds (not 3000 — unit is seconds, not ms)
-browser_snapshot({ target: "main" })         ← always target "main"; do NOT use depth-limited
-                                               snapshots (depth: 4 collapses too much and hides
-                                               the stats block); do NOT use element refs from a
-                                               previous page's snapshot (refs don't transfer across
-                                               page navigations and will throw "does not match")
-→ Look for the "Latest Stats" / "最新数据" section inside main
-  Pattern A DOM:  li[0] = first indicator, li[1] = second indicator
-  For each li:    current value in generic[ref=eN87] text, prev in generic[ref=eN88] "Prev: X"
-                  date shown in generic[ref=eN86] beside the series link
+browser_wait_for({ time: 2 })                ← 2s is sufficient; macromicro loads in ~1.5s
+browser_evaluate({
+  function: `() => {
+    const rows = document.querySelectorAll('div.sidebar-sec.chart-stat-lastrows li');
+    return [...rows].map((li, i) => ({
+      index:   i,
+      name:    li.querySelector('.stat-name a')?.innerText?.trim(),
+      date:    li.querySelector('.date-label')?.innerText?.trim(),
+      current: li.querySelector('.stat-val .val')?.innerText?.trim(),
+      prev:    li.querySelector('.prev-val .val')?.innerText?.trim(),
+    }));
+  }`
+})
 ```
+Returns clean JSON array. Index mapping per page:
+| Page | li[0] | li[1] |
+|------|-------|-------|
+| CNN F&G (chart 50108) | CNN F&G current+prev | S&P 500 current+prev |
+| MM Bull/Bear (chart 142681) | MM Bull/Bear current+prev | S&P 500 current+prev |
+| AAII (chart 77072) | 看多 current+prev | 看空 current+prev |
 
-**SOFR** (newyorkfed.org — Angular table):
-```
-browser_navigate({ url: "https://www.newyorkfed.org/markets/reference-rates/sofr" })
-browser_wait_for({ time: 4 })                ← do NOT use browser_wait_for({ text: "SOFR" }) —
-                                               the word "SOFR" exists in hidden nav elements
-                                               before the data table loads, causing a 30s timeout
-browser_snapshot({ target: "table" })        ← target the table directly; cleaner than full snapshot
-→ First data row: DATE · RATE · 1st%ile · 25th%ile · 75th%ile · 99th%ile · Vol($B)
-```
+Do NOT use `browser_snapshot` for macromicro — it dumps the full accessibility tree (hundreds of lines) into context; `browser_evaluate` returns ~300 bytes of structured JSON.
 
-**Canada 5Y CMB** (canadaici.com — JS widget):
+**SOFR** — auto-fetched via NY Fed JSON API inside the script. No Playwright needed.
+
+**Canada 5Y GOC + CMB** (canadaici.com — JS widget) — one navigate, one evaluate, both values (verified 2026-06-09):
 ```
 browser_navigate({ url: "https://www.canadaici.com/market-data/" })
-browser_wait_for({ time: 4 })               ← widget is slow to load (unit: seconds)
-browser_snapshot()
-→ Find the CMB yield cell — value looks like "3.34%" near "Canada 5 Year"
-  CSS selector reference: div.widgetTableCell.field3.col3 a
+browser_wait_for({ time: 4 })               ← widget is slow; 4s needed
+browser_evaluate({
+  function: `() => {
+    const links = document.querySelectorAll('div.widgetTableCell.field3.col3 a');
+    const bps   = el => el?.closest('.TableRow')?.querySelector('.widgetTableCell.field4')?.innerText?.trim();
+    return {
+      goc5y: { value: links[0]?.innerText?.trim(), prev: bps(links[0]) },
+      cmb5y: { value: links[2]?.innerText?.trim(), prev: bps(links[2]) },
+    };
+  }`
+})
 ```
+Returns `{ goc5y: { value: "3.23%", prev: "3.19%" }, cmb5y: { value: "3.38%", prev: "3.35%" } }`.
+`field4` column contains the previous day's value. Compute dir by comparing value vs prev.
 
 **加密货币资金流 — BTC row (coinank.com SPA)**:
 

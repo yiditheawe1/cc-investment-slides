@@ -53,43 +53,43 @@ const LIVE_MANUAL = {
   // ── CRYPTO
   fundFlow: {
     items: [
-      { label: '15m',      value: '-1,104.27万',  dir: 'down'    },
-      { label: '4h',       value: '-1.14亿',      dir: 'down'    },
-      { label: '7D',       value: '4,650.61万',   dir: 'up'      },
-      { label: '30D',      value: '57.91亿',      dir: 'up'      },
-      { label: '市值($)',  value: '14,834.95亿',  dir: 'neutral' },
-      { label: '资金信号', value: '+35净流入',     dir: 'up'      },
+      { label: '15m',      value: '3.34亿',         dir: 'up'      },
+      { label: '4h',       value: '7.23亿',         dir: 'up'      },
+      { label: '7D',       value: '15.12亿',        dir: 'up'      },
+      { label: '30D',      value: '-101.54亿',      dir: 'down'    },
+      { label: '市值($)',  value: '12,496.36亿',    dir: 'neutral' },
+      { label: '资金信号', value: '+55强势流入',    dir: 'up'      },
     ],
-    date: 'May 31',
+    date: 'Jun 11',
   },
 
   // ── STOCK
-  cnnFG:  { value: '60.17', change: 'prev 60.09 • Greed', dir: 'up', date: 'May 29' },
+  cnnFG:  { value: '27.46', change: 'prev 32.49 • Fear', dir: 'down', date: 'Jun 10' },
   mm: {
-    mmCurrent:    '68.22',
-    mmPrev:       '61.69',
-    sp500Current: '7,580.06',
-    sp500Prev:    '7,563.63',
-    date:         'Apr 2026',
+    mmCurrent:    '72.12',
+    mmPrev:       '71.08',
+    sp500Current: '7,266.99',
+    sp500Prev:    '7,386.65',
+    date:         'May 2026',
   },
   aaii: {
-    bullCurrent: '35.56%',
-    bullPrev:    '31.72%',
-    bearCurrent: '41.85%',
-    bearPrev:    '43.61%',
-    date:        'May 28',
+    bullCurrent: '36.26%',
+    bullPrev:    '35.56%',
+    bearCurrent: '37.00%',
+    bearPrev:    '41.85%',
+    date:        'Jun 4',
   },
   naaim: {
-    current:  '98.39',
-    prev:     '82.02',
-    ma4w:     '88.61',
-    ma4wPrev: '87.46',
-    date:     '05/27/2026',
+    current:  '86.82',
+    prev:     '98.39',
+    ma4w:     '86.14',
+    ma4wPrev: '88.61',
+    date:     '06/03/2026',
   },
 
   // ── RATES  (canadaici.com — querySelectorAll('div.widgetTableCell.field3.col3 a'))
-  ca5yGoc: { value: '3.23%', change: '+4 bps', dir: 'up', date: 'May 31' }, // index [0] GOC 5Y
-  ca5yCmb: { value: '3.37%', change: '+5 bps', dir: 'up', date: 'May 31' }, // index [2] CMB 5Y
+  ca5yGoc: { value: '3.20%', change: 'prev 3.23% • -3 bps', dir: 'down', date: 'Jun 10' }, // index [0] GOC 5Y
+  ca5yCmb: { value: '3.35%', change: 'prev 3.38% • -3 bps', dir: 'down', date: 'Jun 10' }, // index [2] CMB 5Y
 };
 
 // ════════════════════════════════════════════════════════════════
