@@ -10,8 +10,5 @@ node_modules/
 .claude/settings.local.json
 .claude/agent-memory/
 
-# Old skill version
-.claude/skills/investment-index-slides_old/
-
 # Playwright MCP logs
 .playwright-mcp/

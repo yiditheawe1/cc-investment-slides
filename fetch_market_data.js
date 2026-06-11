@@ -23,7 +23,7 @@ const TODAY = new Date().toISOString().slice(0, 10);
 const MANUAL_KEYS = ['fundFlow', 'cnnFG', 'mm', 'aaii', 'naaim', 'ca5yGoc', 'ca5yCmb'];
 
 // ════════════════════════════════════════════════════════════════
-//  API FETCH  (verbatim from generate_investment_index_slides.js)
+//  API FETCH  (extracted unchanged from the former slides generator)
 //
 //  Sources: alternative.me · CoinGecko · Binance · NY Fed (SOFR)
 //           Yahoo Finance (VIX · 10Y · 30Y · USDCAD · USDCNY · CADCNY)
