@@ -4,56 +4,56 @@
     "items": [
       {
         "label": "15m",
-        "value": "3.34亿",
+        "value": "89.02万",
         "dir": "up"
       },
       {
         "label": "4h",
-        "value": "7.23亿",
-        "dir": "up"
+        "value": "-8,512.83万",
+        "dir": "down"
       },
       {
         "label": "7D",
-        "value": "15.12亿",
+        "value": "19.88亿",
         "dir": "up"
       },
       {
         "label": "30D",
-        "value": "-101.54亿",
+        "value": "-92.44亿",
         "dir": "down"
       },
       {
         "label": "市值($)",
-        "value": "12,496.36亿",
+        "value": "12,552.50亿",
         "dir": "neutral"
       },
       {
         "label": "资金信号",
-        "value": "+55强势流入",
+        "value": "+8流向均衡",
         "dir": "up"
       }
     ],
     "date": "Jun 11"
   },
   "cnnFG": {
-    "value": "27.46",
-    "change": "prev 32.49 • Fear",
-    "dir": "down",
-    "date": "Jun 10"
+    "value": "27.97",
+    "change": "prev 26.91 • Fear",
+    "dir": "up",
+    "date": "Jun 11"
   },
   "mm": {
     "mmCurrent": "72.12",
     "mmPrev": "71.08",
-    "sp500Current": "7,266.99",
-    "sp500Prev": "7,386.65",
+    "sp500Current": "7,301.74",
+    "sp500Prev": "7,266.99",
     "date": "May 2026"
   },
   "aaii": {
-    "bullCurrent": "36.26%",
-    "bullPrev": "35.56%",
-    "bearCurrent": "37.00%",
-    "bearPrev": "41.85%",
-    "date": "Jun 4"
+    "bullCurrent": "30.40%",
+    "bullPrev": "36.26%",
+    "bearCurrent": "47.70%",
+    "bearPrev": "37.00%",
+    "date": "Jun 11"
   },
   "naaim": {
     "current": "86.82",
@@ -63,16 +63,16 @@
     "date": "06/03/2026"
   },
   "ca5yGoc": {
-    "value": "3.20%",
-    "change": "prev 3.23% • -3 bps",
+    "value": "3.18%",
+    "change": "prev 3.20% • -2 bps",
     "dir": "down",
-    "date": "Jun 10"
+    "date": "Jun 11"
   },
   "ca5yCmb": {
-    "value": "3.35%",
-    "change": "prev 3.38% • -3 bps",
+    "value": "3.33%",
+    "change": "prev 3.35% • -2 bps",
     "dir": "down",
-    "date": "Jun 10"
+    "date": "Jun 11"
   },
   "cryptoFG": {
     "value": "12",
@@ -81,14 +81,14 @@
     "date": "Jun 10"
   },
   "btcDom": {
-    "value": "56.3%",
+    "value": "56.2%",
     "change": "—",
     "dir": "neutral",
     "date": "Jun 11"
   },
   "ethBtc": {
-    "value": "0.02624",
-    "change": "-0.79%",
+    "value": "0.02621",
+    "change": "-0.76%",
     "dir": "down",
     "date": "Jun 11"
   },
@@ -122,9 +122,9 @@
     ]
   },
   "vix": {
-    "value": "21.53",
-    "change": "+0.02 (+0.09%)",
-    "dir": "up",
+    "value": "21.46",
+    "change": "-0.05 (-0.23%)",
+    "dir": "down",
     "date": "Jun 11"
   },
   "us10y": {
@@ -140,7 +140,7 @@
     "date": "Jun 11"
   },
   "usdCad": {
-    "value": "1.4004",
+    "value": "1.4011",
     "change": "prev 1.3906",
     "dir": "up",
     "date": "Jun 11"
@@ -152,7 +152,7 @@
     "date": "Jun 11"
   },
   "cadCny": {
-    "value": "4.8376",
+    "value": "4.8377",
     "change": "prev 4.8703",
     "dir": "down",
     "date": "Jun 11"

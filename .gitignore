@@ -2,6 +2,7 @@
 *.pptx
 coinank_snapshot.md
 canadaici_snapshot.md
+scraped-indicators.json
 
 # Node dependencies (install via npm install)
 node_modules/
