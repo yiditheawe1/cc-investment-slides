@@ -20,8 +20,9 @@
    `"…（数据截至 <date>，待刷新）"`. Never present stale numbers as today's.
 3. **Phase A** — fetch all **12** WebFetch URLs as ONE parallel batch (§2). Batching (not count) is the
    lever — issue them all in a single message, never in sequential groups.
-4. **Phase B** — **default SKIP.** Only run Playwright for a category still under 2 usable Phase-A
-   sources, hard-capped at **≤2 sources total**. Sequential, 2 calls each, `browser_evaluate` only.
+4. **Phase B** — run Playwright for any category lacking ≥3 *independent* publishers (Phase A is
+   Investing.com-heavy, so this is needed for real cross-validation). Skip a category once corroborated.
+   Sequential, 2 calls each, `browser_evaluate` only.
 5. **Synthesize** per category (rules in §3), update `recs`/`watches` only if criteria in §4 are met.
 6. **Write** `E:\CC项目\analysis-data.json`, self-check it parses (§6).
 7. `browser_close()` — your **final action** and the teardown for the whole run (Sub-agent A leaves
@@ -48,26 +49,26 @@ Slide 7 combines SOFR + 利率 cause into the `rates.cause` block.
 
 ## 2. Sources
 
-### Phase A — WebFetch all 12 in ONE parallel batch  ⚡ (perf-critical)
+### Phase A — WebFetch all 13 in ONE parallel batch  ⚡
 
-**The speed lever here is batching, not count.** Because the calls run concurrently, wall-time ≈ the
-slowest single fetch whether you send 9 or 12 — so we keep broad coverage and just enforce parallelism.
-**Issue ALL of these as ONE message of parallel WebFetch calls** — never in sequential groups (that was
-the actual Phase-A slowdown). These give ≥3 sources for every category, so **Phase B is normally
-skipped** (see below).
+**The only Phase-A optimization is batching — coverage is unchanged from the original.** Because the
+calls run concurrently, wall-time ≈ the slowest single fetch regardless of count, so broad coverage is
+nearly free; the old slowdown was fetching in sequential groups. **Issue ALL 13 as ONE message of
+parallel WebFetch calls** — never sequentially.
 
 Prompt template per URL: *"Extract up to 5 of the most recent articles (today or yesterday only,
 relative to {DATE}). For each: `• Headline | Date | 1-sentence summary (≤20 words)`. Skip anything
 older than 2 days. ≤80 words total per source. No raw HTML, no commentary."*
 
 ```
-ONE parallel batch (12 URLs):
+ONE parallel batch (13 URLs):
   CRYPTO:  https://www.coindesk.com/
+           https://coinmarketcap.com/headlines/
            https://www.investing.com/news/cryptocurrency-news
            https://www.investing.com/analysis/cryptocurrency
            https://alternative.me/crypto/fear-and-greed-index/     (DATA ONLY — the F&G number, not a
                                                                      causal source; doesn't count toward
-                                                                     the ≥2-source bar for Phase B)
+                                                                     the independent-source bar below)
   STOCK:   https://www.investing.com/news/stock-market-news
            https://www.investing.com/analysis/stock-markets
            https://naaim.org/programs/naaim-exposure-index/
@@ -78,25 +79,26 @@ ONE parallel batch (12 URLs):
   跨板块:  https://www.investing.com/news/headlines
 ```
 
-Only `coinmarketcap.com/headlines` is dropped from the old set (self-described shallow/overlapping).
-Add it to the batch only if CRYPTO somehow comes back thin — rarely needed.
+### Phase B — Playwright (independent corroboration — RUN it)
 
-### Phase B — Playwright (DEFAULT: SKIP)  ⚡
-
-Phase B is the second-biggest time sink: each news site is a heavy `browser_navigate` (5–15s load) +
-evaluate. **Skip Phase B entirely** when every category already has ≥2 usable Phase-A sources — which
-is the normal case with the 12-source batch. Only fall through to Phase B for a category still under 2 sources,
-and then obey a **hard cap of ≤2 Playwright sources for the whole run**. Sequential, **2 calls each**
-(`browser_navigate` → `browser_evaluate`), **never `browser_snapshot`**. Pick from, in priority order:
+⚠️ **Phase A is publisher-concentrated: 8 of 13 URLs are Investing.com.** Cross-validation (§3b) needs
+*independent* sources, so Phase B is not optional padding — it's where the independent corroboration
+comes from (CNBC confirmations, The Block on crypto, CNN). **Run Phase B for any category that does not
+yet have ≥3 quality *independent* sources** (count distinct publishers, not distinct Investing.com
+sub-pages; `alternative.me` is data-only). Skip a category once it's corroborated — you usually won't
+need all 6. Sequential, stateful browser, **2 calls each** (`browser_navigate` → `browser_evaluate`),
+**never `browser_snapshot`** (that's the only Phase-B efficiency rule — snapshots dump thousands of
+lines; evaluate returns compact JSON). The browser is already open from Sub-agent A.
 
 ```
-1. CNBC Markets           https://www.cnbc.com/markets/         → STOCK + macro/rates
-2. The Block              https://www.theblock.co/              → CRYPTO (cross-validate CoinDesk)
-3. CNN Business/Investing https://www.cnn.com/business/investing → STOCK
-4. MarketWatch            https://www.marketwatch.com/          → STOCK + FOREX
+Priority order (stop a category once it has an independent corroborator):
+1. CNBC Markets           https://www.cnbc.com/markets/          → STOCK + macro/rates
+2. CNN Business/Investing https://www.cnn.com/business/investing → STOCK (cross-validate CNBC)
+3. The Block              https://www.theblock.co/               → CRYPTO (cross-validate CoinDesk)
+4. MarketWatch            https://www.marketwatch.com/           → STOCK + FOREX
+5. Bloomberg Markets      https://www.bloomberg.com/markets      → headlines only (paywalled body)
+6. Yahoo Finance News     https://finance.yahoo.com/news/        → broad supplement if gaps remain
 ```
-Bloomberg / Yahoo Finance are last-resort only (paywalled / broad) — usually not worth the load time.
-If you do run Phase B, `log` nothing extra; just fold the results in.
 
 Generic headline-extract evaluate (dedupe + filter short strings):
 ```js
