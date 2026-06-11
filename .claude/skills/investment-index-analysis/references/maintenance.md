@@ -34,6 +34,17 @@ The `playwright` MCP server is configured in `E:\CC项目\.claude\settings.local
 
 A SessionStart hook also kills stray `mcp-chrome` Chrome processes — leave it in place.
 
+**Install (verified 2026-06-11):** `@playwright/mcp@0.0.75` is a project dependency in `package.json`
+(`"@playwright/mcp": "^0.0.75"`), so `npm install` in the project root restores both `cli.js` and the
+bundled `playwright` + chromium. No global/`npx` fetch is involved.
+
+**Multi-run safety (verified 2026-06-11):** the skill is safe to run repeatedly in one session without
+a restart. The MCP server is session-persistent; only the *page* opens/closes. Sub-agent B closes the
+page at the end of each run (`browser_close` → "No open tabs"); Sub-agent A's first `browser_navigate`
+re-creates it on the next run. Confirmed empirically: `navigate → evaluate → close → navigate →
+evaluate` all succeed in sequence. Navigations reuse the single tab (no accumulation) and no element
+refs are cached across pages, so a prior run's state never leaks into a later one.
+
 ---
 
 ## 2. Carry-forward strategy (supersedes old "never carry forward" rule)

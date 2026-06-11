@@ -24,7 +24,10 @@
    2 calls per source, `browser_evaluate` only.
 5. **Synthesize** per category (rules in §3), update `recs`/`watches` only if criteria in §4 are met.
 6. **Write** `E:\CC项目\analysis-data.json`, self-check it parses (§6).
-7. `browser_close()` (skip silently if unavailable).
+7. `browser_close()` — your **final action** and the teardown for the whole run (Sub-agent A leaves
+   the browser open for you). Do this even if synthesis hit problems, so the next run in this session
+   starts clean; skip silently only if the tool is unavailable. (If the run aborts before you close,
+   it's harmless — the next run's Sub-agent A re-opens the browser on its first `browser_navigate`.)
 8. **Return** the ≤200-char summary (§7).
 
 ---

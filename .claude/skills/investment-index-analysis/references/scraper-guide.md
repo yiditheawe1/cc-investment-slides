@@ -21,6 +21,11 @@ entirely** from the JSON. Do **not** fabricate a value, do **not** carry forward
 downstream `fetch_market_data.js` handles carry-forward), do **not** stop to ask the user for a DOM
 paste, do **not** abort the run. Just leave the key out and note it in the failed-list.
 
+**Browser lifecycle:** your first `browser_navigate` (re)creates the page on demand — it works whether
+or not a previous skill run in this session left the browser open, so **do not assume a clean slate and
+do not try to reset it**. **Do NOT call `browser_close`** — Sub-agent B reuses this same browser after
+you and owns teardown. Navigations reuse the one tab, so they don't accumulate.
+
 ---
 
 ## 1. The 7 keys you produce
